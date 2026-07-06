@@ -6,6 +6,14 @@
 <h1><%= @book.title %></h1>
 <p>by <%= @book.author %></p>
 <p><%= simple_format(@book.description) if @book.description.present? %></p>
+<p>
+  Genres:
+  <% if @book.genres.any? %>
+    <%= @book.genres.order(:name).pluck(:name).join(", ") %>
+  <% else %>
+    <em>None</em>
+  <% end %>
+</p>
 
 <% if Current.user == @book.user %>
   <%= link_to "Edit", edit_book_path(@book) %>

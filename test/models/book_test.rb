@@ -12,8 +12,13 @@ class BookTest < ActiveSupport::TestCase
   end
 
   test "valid without description" do
-    book = Book.new(title: "A Title", author: "A", description: nil, user: users(:one))
+    book = Book.new(title: "A Title", author: "A", description: nil, user: users(:one), genres: [ genres(:fiction) ])
     assert book.valid?
+  end
+
+  test "invalid without at least one genre" do
+    book = Book.new(title: "A Title", author: "A", user: users(:one), genres: [])
+    assert_not book.valid?
   end
 
   test "belongs to a user" do

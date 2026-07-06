@@ -1,0 +1,7 @@
+one:
+  book: one
+  genre: fiction
+
+two:
+  book: two
+  genre: non_fiction

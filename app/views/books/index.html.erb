@@ -17,6 +17,7 @@
   <% @books.each do |book| %>
     <li>
       <%= link_to book.title, book %> by <%= book.author %>
+      (Genres: <%= book.genres.any? ? book.genres.map(&:name).sort.join(", ") : content_tag(:em, "None") %>)
       <% if Current.user == book.user %>
         <%= link_to "Edit", edit_book_path(book) %>
         <%= button_to "Delete", book, method: :delete, data: { confirm: "Are you sure?" } %>

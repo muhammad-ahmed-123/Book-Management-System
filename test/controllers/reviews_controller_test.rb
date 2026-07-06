@@ -170,4 +170,22 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_match reviews(:one).body, response.body
   end
+
+  test "requesting a nonexistent book_id redirects instead of raising" do
+    sign_in_as users(:two)
+
+    get new_book_review_url(999999)
+
+    assert_redirected_to books_url
+    follow_redirect!
+    assert_equal "That book doesn't exist.", flash[:alert]
+  end
+
+  test "requesting a non-numeric book_id redirects instead of raising" do
+    sign_in_as users(:two)
+
+    get "/books/abc/reviews/new"
+
+    assert_redirected_to books_url
+  end
 end

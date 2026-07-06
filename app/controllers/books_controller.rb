@@ -4,12 +4,12 @@ class BooksController < ApplicationController
   before_action :set_own_book, only: %i[ edit update destroy ]
 
   def index
-    @books = Book.all.order(created_at: :desc)
+    @books = Book.includes(:genres).order(created_at: :desc)
   end
 
   def show
     @reviews = @book.reviews.includes(:user).order(created_at: :desc)
-    @current_user_review = @book.reviews.find_by(user: Current.user) if Current.user
+    @current_user_review = @book.reviews.find_by(user: Current.user) if authenticated?
   end
 
   def new
@@ -17,9 +17,12 @@ class BooksController < ApplicationController
   end
 
   def create
-    @book = Current.user.books.build(book_params)
+    @book = Current.user.books.build(book_params.merge(genre_ids: sanitized_genre_ids))
 
-    if @book.save
+    if sanitized_genre_ids.empty?
+      @book.errors.add(:genres, "can't be blank")
+      render :new, status: :unprocessable_entity
+    elsif @book.save
       redirect_to @book, notice: "Book was successfully created."
     else
       render :new, status: :unprocessable_entity
@@ -30,7 +33,10 @@ class BooksController < ApplicationController
   end
 
   def update
-    if @book.update(book_params)
+    if genre_ids_submitted? && sanitized_genre_ids.empty?
+      @book.errors.add(:genres, "can't be blank")
+      render :edit, status: :unprocessable_entity
+    elsif @book.update(book_params_with_sanitized_genre_ids)
       redirect_to @book, notice: "Book was successfully updated."
     else
       render :edit, status: :unprocessable_entity
@@ -44,7 +50,8 @@ class BooksController < ApplicationController
 
   private
     def set_public_book
-      @book = Book.find(params[:id])
+      @book = Book.find_by(id: params[:id])
+      redirect_to books_path, alert: "That book doesn't exist." unless @book
     end
 
     def set_own_book
@@ -53,6 +60,19 @@ class BooksController < ApplicationController
     end
 
     def book_params
-      params.require(:book).permit(:title, :author, :description)
+      params.require(:book).permit(:title, :author, :description, genre_ids: [])
+    end
+
+    def genre_ids_submitted?
+      params[:book]&.key?(:genre_ids)
+    end
+
+    def sanitized_genre_ids
+      Array(book_params[:genre_ids]).reject(&:blank?)
+    end
+
+    def book_params_with_sanitized_genre_ids
+      return book_params unless genre_ids_submitted?
+      book_params.merge(genre_ids: sanitized_genre_ids)
     end
 end

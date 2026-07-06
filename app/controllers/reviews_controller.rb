@@ -39,7 +39,8 @@ class ReviewsController < ApplicationController
 
   private
     def set_book
-      @book = Book.find(params[:book_id])
+      @book = Book.find_by(id: params[:book_id])
+      redirect_to books_path, alert: "That book doesn't exist." unless @book
     end
 
     def block_self_review

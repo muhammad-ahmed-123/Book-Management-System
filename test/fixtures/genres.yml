@@ -1,0 +1,8 @@
+fiction:
+  name: Fiction
+
+non_fiction:
+  name: Non-fiction
+
+mystery:
+  name: Mystery

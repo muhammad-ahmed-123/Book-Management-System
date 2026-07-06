@@ -10,7 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_06_073308) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_06_133253) do
+  create_table "book_genres", force: :cascade do |t|
+    t.integer "book_id", null: false
+    t.datetime "created_at", null: false
+    t.integer "genre_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["book_id", "genre_id"], name: "index_book_genres_on_book_id_and_genre_id", unique: true
+    t.index ["book_id"], name: "index_book_genres_on_book_id"
+    t.index ["genre_id"], name: "index_book_genres_on_genre_id"
+  end
+
   create_table "books", force: :cascade do |t|
     t.string "author", null: false
     t.datetime "created_at", null: false
@@ -19,6 +29,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_06_073308) do
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
     t.index ["user_id"], name: "index_books_on_user_id"
+  end
+
+  create_table "genres", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_genres_on_name", unique: true
   end
 
   create_table "reviews", force: :cascade do |t|
@@ -50,6 +67,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_06_073308) do
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
+  add_foreign_key "book_genres", "books"
+  add_foreign_key "book_genres", "genres"
   add_foreign_key "books", "users"
   add_foreign_key "reviews", "books"
   add_foreign_key "reviews", "users"
