@@ -1,0 +1,26 @@
+<% content_for :title, "Books" %>
+
+<%= tag.div(flash[:alert], style: "color:red") if flash[:alert] %>
+<%= tag.div(flash[:notice], style: "color:green") if flash[:notice] %>
+
+<h1>Books</h1>
+
+<% if authenticated? %>
+  <%= link_to "New Book", new_book_path %>
+  <%= button_to "Sign Out", session_path, method: :delete %>
+<% else %>
+  <%= link_to "Sign In", new_session_path %>
+  <%= link_to "Sign Up", new_registration_path %>
+<% end %>
+
+<ul>
+  <% @books.each do |book| %>
+    <li>
+      <%= link_to book.title, book %> by <%= book.author %>
+      <% if Current.user == book.user %>
+        <%= link_to "Edit", edit_book_path(book) %>
+        <%= button_to "Delete", book, method: :delete, data: { confirm: "Are you sure?" } %>
+      <% end %>
+    </li>
+  <% end %>
+</ul>

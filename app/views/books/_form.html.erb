@@ -1,0 +1,24 @@
+<%= tag.div(flash[:alert], style: "color:red") if flash[:alert] %>
+
+<% if book.errors.any? %>
+  <div style="color:red">
+    <ul>
+      <% book.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%= form_with model: book do |form| %>
+  <%= form.label :title %><br>
+  <%= form.text_field :title, required: true %><br>
+
+  <%= form.label :author %><br>
+  <%= form.text_field :author, required: true %><br>
+
+  <%= form.label :description %><br>
+  <%= form.text_area :description %><br>
+
+  <%= form.submit %>
+<% end %>

@@ -1,0 +1,11 @@
+one:
+  title: The Pragmatic Programmer
+  author: David Thomas
+  description: A guide to software craftsmanship.
+  user: one
+
+two:
+  title: Clean Code
+  author: Robert C. Martin
+  description: A handbook of agile software craftsmanship.
+  user: two
