@@ -28,7 +28,7 @@ module Authentication
     def find_session_by_cookie
       Session.find_by(id: cookies.signed[:session_id]) if cookies.signed[:session_id]
     end
-    
+
     def request_authentication
       session[:return_to_after_authenticating] = request.url
       redirect_to new_session_path
