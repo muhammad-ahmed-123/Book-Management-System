@@ -5,23 +5,29 @@
 
 <% unless authenticated? %>
   <section class="hero">
-    <h1 class="hero__title">Track every book you read.</h1>
-    <p class="hero__subtitle">Day5 helps you catalog books, organize them by genre, and share honest reviews with a community of readers.</p>
+    <h1 class="hero__title">Track every book you read, <em>reviewed by us.</em></h1>
+    <p class="hero__subtitle">Marginalia helps you catalog books, organize them by genre, and share honest reviews with a community of readers.</p>
     <div class="hero__actions">
       <%= link_to "Sign Up", new_registration_path, class: "btn btn-primary" %>
       <%= link_to "Sign In", new_session_path, class: "btn" %>
     </div>
   </section>
-<% else %>
-  <h1>Books</h1>
 <% end %>
+
+<p class="section-label">All books</p>
 
 <ul class="book-grid">
   <% @books.each do |book| %>
     <li class="book-card">
       <h3><%= link_to book.title, book %></h3>
       <p>by <%= book.author %></p>
-      <p>Genres: <%= book.genres.any? ? book.genres.map(&:name).sort.join(", ") : content_tag(:em, "None") %></p>
+      <% if book.genres.any? %>
+        <div class="genre-tags">
+          <% book.genres.order(:name).each do |genre| %>
+            <span class="genre-tag"><%= genre.name %></span>
+          <% end %>
+        </div>
+      <% end %>
       <% if Current.user == book.user %>
         <div class="book-actions">
           <%= link_to "Edit", edit_book_path(book), class: "btn" %>

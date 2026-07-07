@@ -18,7 +18,7 @@ class ReviewsTest < ApplicationSystemTestCase
     click_on "Create Review"
 
     assert_text "Review was successfully created."
-    assert_text "4/5"
+    assert_text "★★★★☆"
     assert_text "Really enjoyed this one."
     assert_current_path book_path(@book_one)
   end
@@ -100,7 +100,7 @@ class ReviewsTest < ApplicationSystemTestCase
     click_on "Update Review"
 
     assert_text "Review was successfully updated."
-    assert_text "2/5"
+    assert_text "★★☆☆☆"
     assert_text "Changed my mind on reflection."
   end
 

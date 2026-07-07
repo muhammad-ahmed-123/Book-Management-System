@@ -1,98 +1,114 @@
 /*
- * This is a manifest file that'll be compiled into application.css.
+ * Marginalia — editorial theme for the Book Management System.
+ * Drop-in replacement for app/assets/stylesheets/application.css.
+ * Reuses every existing class name, so the ERB templates need almost no changes
+ * (see README for the two small tag-chip edits).
  *
- * With Propshaft, assets are served efficiently without preprocessing steps. You can still include
- * application-wide styles in this file, but keep in mind that CSS precedence will follow the standard
- * cascading order, meaning styles declared later in the document or manifest will override earlier ones,
- * depending on specificity.
- *
- * Consider organizing styles into separate files for maintainability.
+ * Mobile-first. Breakpoints: 600px (tablet), 1024px (desktop).
+ * REQUIRES the Newsreader + Instrument Sans <link> in the layout <head> (see README).
  */
 
-/* Mobile-first base styles. Breakpoints: 600px (tablet), 1024px (desktop). */
-
 :root {
-  --color-primary: #4f46e5;
-  --color-primary-hover: #4338ca;
-  --color-primary-active: #3730a3;
-  --color-primary-contrast: #ffffff;
-  --color-accent: #7c3aed;
+  /* Type */
+  --font-serif: "Newsreader", Georgia, "Times New Roman", serif;   /* headlines + reading */
+  --font-ui:    "Instrument Sans", system-ui, -apple-system, sans-serif; /* nav, labels, buttons */
 
-  --color-danger: #dc2626;
-  --color-danger-hover: #b91c1c;
-  --color-danger-bg: #fef2f2;
-  --color-danger-border: #fecaca;
-  --color-danger-text: #7f1d1d;
+  /* Accent (oxblood) */
+  --color-primary: #9c3d2e;
+  --color-primary-hover: #7d2f22;
+  --color-primary-active: #6d281d;
+  --color-primary-contrast: #fbf9f5;
+  --color-accent: #9c3d2e;
 
-  --color-success-bg: #ecfdf5;
-  --color-success-border: #a7f3d0;
-  --color-success-text: #065f46;
+  /* Danger / errors (same warm family) */
+  --color-danger: #9c3d2e;
+  --color-danger-hover: #7d2f22;
+  --color-danger-bg: #f7ece9;
+  --color-danger-border: #e2c9c2;
+  --color-danger-text: #9c3d2e;
 
-  --color-bg: #f8fafc;
-  --color-surface: #ffffff;
-  --color-surface-alt: #f1f5f9;
-  --color-border: #e2e8f0;
-  --color-border-strong: #cbd5e1;
-  --color-text: #1e293b;
-  --color-text-muted: #64748b;
+  /* Success flash (muted sage) */
+  --color-success-bg: #eef2e8;
+  --color-success-border: #cdd8bf;
+  --color-success-text: #4f6340;
 
-  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
-  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.06);
-  --shadow-lg: 0 12px 24px -6px rgba(79, 70, 229, 0.18), 0 4px 8px rgba(15, 23, 42, 0.06);
+  /* Paper surfaces + ink */
+  --color-bg: #f4efe6;          /* page paper */
+  --color-surface: #fffdf8;     /* inputs / raised */
+  --color-surface-alt: #f7f3ea; /* navbar / hover */
+  --color-border: #e6e0d4;      /* hairline rule */
+  --color-border-strong: #d6cebe; /* input border */
+  --color-text: #2a241c;        /* ink */
+  --color-text-body: #403a30;   /* long-form reading */
+  --color-text-muted: #8a8073;
+  --color-text-faint: #a89e8e;
+
+  /* Tags */
+  --color-tag-bg: #ece6d8;
+  --color-tag-text: #7a715f;
+
+  /* Stars */
+  --color-star: #c08a2e;
+
+  --radius: 6px;
+  --radius-sm: 5px;
+  --radius-pill: 20px;
+
+  --shadow-sm: 0 1px 2px rgba(42, 36, 28, 0.05);
+  --shadow-md: 0 4px 14px rgba(42, 36, 28, 0.07);
 
   --ease-standard: cubic-bezier(0.16, 1, 0.3, 1);
   --duration-fast: 150ms;
-  --duration-base: 300ms;
+  --duration-base: 450ms;
 }
 
-*, *::before, *::after {
-  box-sizing: border-box;
-}
+*, *::before, *::after { box-sizing: border-box; }
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: var(--font-serif);
+  font-size: 1.0625rem;
   line-height: 1.5;
   color: var(--color-text);
   background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
 }
 
-img, svg {
-  max-width: 100%;
-  height: auto;
-}
+::selection { background: #e4c8bf; }
+
+img, svg { max-width: 100%; height: auto; }
+
+a { color: var(--color-primary); text-decoration: none; }
+a:hover { color: var(--color-primary-hover); }
 
 .container {
   width: 100%;
-  max-width: 1024px;
+  max-width: 920px;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 0 1.25rem 4rem;
 }
 
-@media (min-width: 600px) {
-  .container {
-    padding: 1.5rem;
-  }
-}
+@media (min-width: 600px) { .container { padding: 0 1.75rem 5rem; } }
 
-@media (min-width: 1024px) {
-  .container {
-    padding: 2rem;
-  }
-}
+/* Headings — editorial serif */
 
 h1 {
-  font-size: 1.5rem;
-  margin: 0 0 1rem;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(2rem, 5vw, 2.5rem);
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  margin: 2.25rem 0 1rem;
 }
 
-@media (min-width: 600px) {
-  h1 {
-    font-size: 2rem;
-  }
+h2 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: 1.4rem;
+  margin: 2.5rem 0 0.5rem;
 }
 
-/* Page header (legacy, still used by non-index pages that render a bare h1) */
+/* Legacy page header (still used by some pages) */
 
 .page-header {
   display: flex;
@@ -102,36 +118,19 @@ h1 {
 }
 
 @media (min-width: 600px) {
-  .page-header {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
+  .page-header { flex-direction: row; align-items: center; justify-content: space-between; }
 }
 
-.site-nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
+.site-nav { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 
-/* Global navbar (glassmorphism) */
+/* ---------------------------------------------------------------- Navbar */
 
 .site-navbar {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--color-surface-alt);
   border-bottom: 1px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
-}
-
-@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
-  .site-navbar {
-    background: rgba(255, 255, 255, 0.6);
-    backdrop-filter: saturate(180%) blur(12px);
-    -webkit-backdrop-filter: saturate(180%) blur(12px);
-  }
 }
 
 .site-navbar__inner {
@@ -139,135 +138,125 @@ h1 {
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
+  max-width: 920px;
+  padding: 1.05rem 1.25rem;
 }
+
+@media (min-width: 600px) { .site-navbar__inner { padding: 1.05rem 1.75rem; } }
 
 .site-navbar__brand {
-  font-weight: 700;
-  font-size: 1.15rem;
-  color: var(--color-primary);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.45rem;
+  letter-spacing: 0.2px;
+  color: var(--color-text);
   text-decoration: none;
 }
+.site-navbar__brand:hover { color: var(--color-text); }
 
-.site-navbar__links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  align-items: center;
-}
+.site-navbar__links { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
 
-/* Hero (signed-out landing content on books#index) */
+/* ---------------------------------------------------------------- Hero */
 
 .hero {
   text-align: center;
-  padding: 2.5rem 1rem 3rem;
-  margin-bottom: 2rem;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%);
-  border: 1px solid var(--color-border);
+  padding: 3.5rem 1rem 2.75rem;
+  margin: 0 0 1rem;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .hero__title {
-  font-size: 1.75rem;
-  margin: 0 0 0.75rem;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(2.4rem, 6.5vw, 4rem);
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  max-width: 14ch;
+  margin: 0 auto 0.5rem;
   color: var(--color-text);
 }
 
-@supports (background-clip: text) or (-webkit-background-clip: text) {
-  .hero__title {
-    background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-}
+/* Wrap the last word(s) of the headline in <em> to get the oxblood accent. */
+.hero__title em { font-style: italic; color: var(--color-primary); }
 
 .hero__subtitle {
-  max-width: 40rem;
-  margin: 0 auto 1.5rem;
+  font-family: var(--font-serif);
+  max-width: 46ch;
+  margin: 1.25rem auto 1.75rem;
   color: var(--color-text-muted);
-  font-size: 1.05rem;
+  font-size: 1.2rem;
+  line-height: 1.55;
 }
 
-.hero__actions {
+.hero__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; }
+
+/* Kicker label above the book list / reviews (optional; see README) */
+.section-label {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.75rem;
+  align-items: center;
+  gap: 0.9rem;
+  margin: 2.25rem 0 0.5rem;
+  font-family: var(--font-ui);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--color-text-faint);
 }
+.section-label::after { content: ""; flex: 1; height: 1px; background: var(--color-border); }
 
-@media (min-width: 600px) {
-  .hero__title {
-    font-size: 2.25rem;
-  }
-
-  .hero {
-    padding: 3.5rem 2rem 4rem;
-  }
-}
-
-/* Flash messages */
+/* ---------------------------------------------------------------- Flash / errors */
 
 .flash {
-  padding: 0.75rem 1rem;
-  border-radius: 6px;
-  margin-bottom: 1rem;
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  padding: 0.7rem 1rem;
+  border-radius: var(--radius);
+  margin: 1.25rem 0 0;
   word-break: break-word;
 }
-
-.flash.alert {
-  color: var(--color-danger-text);
-  background: var(--color-danger-bg);
-  border: 1px solid var(--color-danger-border);
-}
-
-.flash.notice {
-  color: var(--color-success-text);
-  background: var(--color-success-bg);
-  border: 1px solid var(--color-success-border);
-}
+.flash.alert  { color: var(--color-danger-text);  background: var(--color-danger-bg);  border: 1px solid var(--color-danger-border); }
+.flash.notice { color: var(--color-success-text); background: var(--color-success-bg); border: 1px solid var(--color-success-border); }
 
 .errors {
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
   color: var(--color-danger-text);
   background: var(--color-danger-bg);
   border: 1px solid var(--color-danger-border);
-  border-radius: 6px;
-  padding: 0.75rem 1rem;
-  margin-bottom: 1rem;
+  border-radius: var(--radius);
+  padding: 0.7rem 1rem 0.7rem 1.25rem;
+  margin: 1rem 0 1.5rem;
 }
+.errors ul { margin: 0; padding-left: 1.1rem; }
 
-.errors ul {
-  margin: 0;
-  padding-left: 1.25rem;
-}
-
-/* Buttons */
+/* ---------------------------------------------------------------- Buttons
+ * Consistent across <a class="btn">, input[type=submit], and button_to's <button>.
+ * Default = quiet outline; .btn-primary / submit = filled oxblood; .btn-danger = warm outline.
+ */
 
 .btn, input[type="submit"], button {
-  display: inline-block;
-  font: inherit;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  border: 1px solid var(--color-border-strong);
-  background: var(--color-surface);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  padding: 0.7rem 1.15rem;
+  min-height: 2.6rem;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--color-border-strong);
+  background: transparent;
   color: var(--color-text);
   cursor: pointer;
   text-decoration: none;
-  min-height: 2.5rem;
-  transition: background-color var(--duration-fast) ease, border-color var(--duration-fast) ease,
-              box-shadow var(--duration-fast) ease, transform var(--duration-fast) ease;
+  transition: background-color var(--duration-fast) ease, border-color var(--duration-fast) ease, color var(--duration-fast) ease;
 }
 
-.btn:hover, input[type="submit"]:hover, button:hover {
-  background: var(--color-surface-alt);
-  box-shadow: var(--shadow-sm);
-  transform: translateY(-1px);
-}
-
-.btn:active, input[type="submit"]:active, button:active {
-  transform: translateY(0);
-}
+.btn:hover, button:hover { border-color: var(--color-text); background: transparent; }
 
 .btn:focus-visible, input[type="submit"]:focus-visible, button:focus-visible, a:focus-visible {
   outline: 2px solid var(--color-primary);
@@ -279,42 +268,38 @@ h1 {
   border-color: var(--color-primary);
   color: var(--color-primary-contrast);
 }
-
 .btn-primary:hover, input[type="submit"]:hover {
   background: var(--color-primary-hover);
   border-color: var(--color-primary-hover);
+  color: var(--color-primary-contrast);
 }
-
 .btn-primary:active, input[type="submit"]:active {
   background: var(--color-primary-active);
   border-color: var(--color-primary-active);
 }
 
 .btn-danger {
-  background: var(--color-danger);
-  border-color: var(--color-danger);
-  color: #fff;
+  background: transparent;
+  border-color: var(--color-danger-border);
+  color: var(--color-danger);
 }
+.btn-danger:hover { background: var(--color-danger-bg); border-color: var(--color-danger); color: var(--color-danger); }
 
-.btn-danger:hover {
-  background: var(--color-danger-hover);
-  border-color: var(--color-danger-hover);
-}
+/* ---------------------------------------------------------------- Forms */
 
-/* Forms */
+form { max-width: 34rem; }
 
-form {
-  max-width: 32rem;
-}
-
-.field {
-  margin-bottom: 1rem;
-}
+.field { margin-bottom: 1.25rem; }
 
 .field label {
   display: block;
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
   font-weight: 600;
-  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-muted);
+  margin-bottom: 0.5rem;
 }
 
 .field input[type="text"],
@@ -323,37 +308,60 @@ form {
 .field textarea,
 .field select {
   width: 100%;
-  padding: 0.5rem;
-  border: 1px solid var(--color-border-strong);
-  border-radius: 6px;
-  font: inherit;
+  padding: 0.75rem 0.875rem;
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border-strong);
+  border-radius: var(--radius);
 }
 
-.field textarea {
-  min-height: 6rem;
+.field input:focus, .field textarea:focus, .field select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(156, 61, 46, 0.12);
 }
 
+.field textarea { min-height: 7rem; line-height: 1.55; resize: vertical; }
+.field select { max-width: 12rem; }
+
+/* Genre checkboxes as pill chips */
 .checkbox-list {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem 1.25rem;
+  gap: 0.55rem;
 }
-
+.checkbox-list li { margin: 0; }
 .checkbox-list label {
-  font-weight: normal;
+  font-family: var(--font-ui);
+  font-weight: 500;
+  font-size: 0.85rem;
+  color: var(--color-text);
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.45rem;
+  padding: 0.5rem 0.8rem;
+  border: 1.5px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  cursor: pointer;
 }
+.checkbox-list input[type="checkbox"] { accent-color: var(--color-primary); width: 15px; height: 15px; }
+/* Optional: highlight a checked chip — needs :has() support */
+.checkbox-list label:has(input:checked) { border-color: var(--color-primary); background: var(--color-danger-bg); }
 
 .auth-links {
-  margin-top: 1rem;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  margin-top: 1.25rem;
+  color: var(--color-text-muted);
 }
 
-/* Book grid */
+/* ---------------------------------------------------------------- Book index (editorial list) */
 
 .book-grid {
   list-style: none;
@@ -361,146 +369,161 @@ form {
   padding: 0;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1rem;
+  gap: 0 2.75rem;
 }
 
-@media (min-width: 600px) {
-  .book-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 1024px) {
-  .book-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
+@media (min-width: 700px) { .book-grid { grid-template-columns: 1fr 1fr; } }
 
 .book-card {
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  padding: 1rem;
-  background: var(--color-surface);
-  box-shadow: var(--shadow-sm);
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 1.4rem 0;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  transition: box-shadow var(--duration-base) ease, transform var(--duration-base) ease;
-}
-
-.book-card:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+  gap: 0.4rem;
 }
 
 .book-card h3 {
   margin: 0;
-  font-size: 1.1rem;
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: 1.5rem;
+  line-height: 1.15;
+}
+.book-card h3 a { color: var(--color-text); }
+.book-card h3 a:hover { color: var(--color-primary); }
+
+.book-card p {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
 }
 
-.book-card .book-actions {
-  margin-top: auto;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+.book-card .book-actions { margin-top: 0.35rem; display: flex; flex-wrap: wrap; gap: 0.9rem; }
+
+/* Inline owner controls on cards = quiet text links, not full buttons */
+.book-card .book-actions .btn {
+  min-height: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+.book-card .book-actions .btn:hover { color: var(--color-text); }
+.book-card .book-actions .btn-danger { color: #b58a80; }
+.book-card .book-actions .btn-danger:hover { color: var(--color-primary); background: none; }
+
+/* Genre tag chips (used on index + show — see README for the ERB) */
+.genre-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.15rem; }
+.genre-tag {
+  font-family: var(--font-ui);
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--color-tag-text);
+  background: var(--color-tag-bg);
+  padding: 0.28rem 0.6rem;
+  border-radius: var(--radius-sm);
 }
 
-/* Book show page */
+/* ---------------------------------------------------------------- Book show */
 
+.book-detail { max-width: 42rem; }
+.book-detail h1 { margin-top: 1.5rem; }
+.book-detail > p:first-of-type {
+  font-family: var(--font-ui);
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  margin: 0.5rem 0;
+}
 .book-detail p {
+  font-size: 1.2rem;
+  line-height: 1.62;
+  color: var(--color-text-body);
   overflow-wrap: anywhere;
 }
+.book-detail .genre-tags { margin: 1rem 0 1.5rem; }
+.book-detail .genre-tag { font-size: 0.75rem; padding: 0.32rem 0.7rem; }
 
-.book-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin: 1rem 0;
-}
+.book-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 1.5rem 0; }
 
-/* Reviews */
+/* "You can't review your own book" note */
+.book-detail + .book-actions + p em,
+p em { color: var(--color-text-faint); }
+
+/* ---------------------------------------------------------------- Reviews */
 
 .review-list {
   list-style: none;
-  margin: 0;
+  margin: 0.5rem 0 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
 }
 
 .review-card {
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  padding: 1rem;
-  background: var(--color-surface);
-  box-shadow: var(--shadow-sm);
-  transition: box-shadow var(--duration-base) ease, transform var(--duration-base) ease;
-}
-
-.review-card:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+  border: none;
+  border-top: 1px solid var(--color-border);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 1.4rem 0;
 }
 
 .review-card .review-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  align-items: baseline;
+  gap: 0.75rem;
+  align-items: center;
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
 }
+/* Rating "4/5" — accent it. (Optional: render gold stars instead; see README.) */
+.review-card .review-meta strong { color: var(--color-star); font-weight: 600; font-size: 0.95rem; }
 
 .review-card p {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  line-height: 1.55;
+  color: var(--color-text-body);
+  margin: 0.6rem 0 0;
   overflow-wrap: anywhere;
 }
 
-.review-card .review-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
+.review-card .review-actions { display: flex; flex-wrap: wrap; gap: 0.9rem; margin-top: 0.7rem; }
+.review-card .review-actions .btn {
+  min-height: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
 }
+.review-card .review-actions .btn:hover { color: var(--color-text); }
+.review-card .review-actions .btn-danger { color: #b58a80; }
+.review-card .review-actions .btn-danger:hover { color: var(--color-primary); background: none; }
 
-/* Animations */
+/* ---------------------------------------------------------------- Auth pages
+ * Optional: wrap sessions/registrations/passwords content in <div class="auth-card">
+ * for the centered narrow column shown in the prototype. Works without it too.
+ */
+.auth-card { max-width: 25rem; margin: 3rem auto 0; }
+.auth-card h1 { text-align: center; font-size: 1.6rem; }
+.auth-card form { max-width: none; }
+.auth-card .auth-links { display: flex; justify-content: space-between; }
 
-@keyframes fade-slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
+/* ---------------------------------------------------------------- Motion */
 
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+@keyframes fade-slide-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes flash-in { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
 
-@keyframes flash-in {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.hero, .book-card, .review-card {
-  animation: fade-slide-up var(--duration-base) var(--ease-standard) both;
-}
-
-.flash {
-  animation: flash-in var(--duration-fast) var(--ease-standard) both;
-}
-
-.book-card:nth-child(6n+1), .review-card:nth-child(6n+1) { animation-delay: 0ms; }
-.book-card:nth-child(6n+2), .review-card:nth-child(6n+2) { animation-delay: 60ms; }
-.book-card:nth-child(6n+3), .review-card:nth-child(6n+3) { animation-delay: 120ms; }
-.book-card:nth-child(6n+4), .review-card:nth-child(6n+4) { animation-delay: 180ms; }
-.book-card:nth-child(6n+5), .review-card:nth-child(6n+5) { animation-delay: 240ms; }
-.book-card:nth-child(6n),   .review-card:nth-child(6n)   { animation-delay: 300ms; }
+main.container > * { animation: fade-slide-up var(--duration-base) var(--ease-standard) both; }
+.flash { animation: flash-in var(--duration-fast) var(--ease-standard) both; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -508,9 +531,5 @@ form {
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
-  }
-
-  .book-card:hover, .review-card:hover, .btn:hover {
-    transform: none;
   }
 }

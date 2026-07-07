@@ -7,14 +7,13 @@
   <h1><%= @book.title %></h1>
   <p>by <%= @book.author %></p>
   <p><%= simple_format(@book.description) if @book.description.present? %></p>
-  <p>
-    Genres:
-    <% if @book.genres.any? %>
-      <%= @book.genres.order(:name).pluck(:name).join(", ") %>
-    <% else %>
-      <em>None</em>
-    <% end %>
-  </p>
+  <% if @book.genres.any? %>
+    <div class="genre-tags">
+      <% @book.genres.order(:name).each do |genre| %>
+        <span class="genre-tag"><%= genre.name %></span>
+      <% end %>
+    </div>
+  <% end %>
 </div>
 
 <% if Current.user == @book.user %>
@@ -24,7 +23,7 @@
   </div>
 <% end %>
 
-<h2>Reviews</h2>
+<p class="section-label">Reviews</p>
 
 <% if @reviews.any? %>
   <ul class="review-list">

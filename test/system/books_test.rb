@@ -52,7 +52,8 @@ class BooksTest < ApplicationSystemTestCase
     click_on "Create Book"
 
     assert_text "Book was successfully created."
-    assert_text "Fiction, Mystery"
+    assert_selector ".genre-tag", text: "Fiction"
+    assert_selector ".genre-tag", text: "Mystery"
   end
 
   test "creating a book without a title shows a validation error and does not save" do

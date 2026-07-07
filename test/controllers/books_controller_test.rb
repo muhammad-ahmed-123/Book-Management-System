@@ -13,7 +13,8 @@ class BooksControllerTest < ActionDispatch::IntegrationTest
 
   test "anonymous can see a review's rating on the book show page" do
     get book_url(books(:one))
-    assert_match "#{reviews(:one).rating}/5", response.body
+    rating = reviews(:one).rating
+    assert_match "★" * rating + "☆" * (5 - rating), response.body
   end
 
   test "review author sees edit and delete controls for their own review on the book show page" do

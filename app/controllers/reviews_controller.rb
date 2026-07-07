@@ -33,7 +33,7 @@ class ReviewsController < ApplicationController
   end
 
   def destroy
-    @review.destroy
+    @review.destroy!
     redirect_to @book, notice: "Review was successfully deleted.", status: :see_other
   end
 

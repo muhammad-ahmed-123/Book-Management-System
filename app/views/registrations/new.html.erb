@@ -1,33 +1,35 @@
 <% content_for :title, "Sign Up" %>
 
-<%= tag.div(flash[:alert], class: "flash alert") if flash[:alert] %>
-<%= tag.div(flash[:notice], class: "flash notice") if flash[:notice] %>
+<div class="auth-card">
+  <%= tag.div(flash[:alert], class: "flash alert") if flash[:alert] %>
+  <%= tag.div(flash[:notice], class: "flash notice") if flash[:notice] %>
 
-<h1>Sign Up</h1>
+  <h1>Sign Up</h1>
 
-<% if @user.errors.any? %>
-  <div class="errors">
-    <ul>
-      <% @user.errors.full_messages.each do |message| %>
-        <li><%= message %></li>
-      <% end %>
-    </ul>
-  </div>
-<% end %>
+  <% if @user.errors.any? %>
+    <div class="errors">
+      <ul>
+        <% @user.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
 
-<%= form_with model: @user, url: registration_path do |form| %>
-  <div class="field">
-    <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "Enter your email address" %>
-  </div>
-  <div class="field">
-    <%= form.password_field :password, required: true, autocomplete: "new-password", placeholder: "Enter your password", maxlength: 72 %>
-  </div>
-  <div class="field">
-    <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", placeholder: "Confirm your password", maxlength: 72 %>
-  </div>
-  <%= form.submit "Sign up" %>
-<% end %>
+  <%= form_with model: @user, url: registration_path do |form| %>
+    <div class="field">
+      <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "Enter your email address" %>
+    </div>
+    <div class="field">
+      <%= form.password_field :password, required: true, autocomplete: "new-password", placeholder: "Enter your password", maxlength: 72 %>
+    </div>
+    <div class="field">
+      <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", placeholder: "Confirm your password", maxlength: 72 %>
+    </div>
+    <%= form.submit "Sign up" %>
+  <% end %>
 
-<p class="auth-links">
-  <%= link_to "Already have an account? Sign in", new_session_path %>
-</p>
+  <p class="auth-links">
+    <%= link_to "Already have an account? Sign in", new_session_path %>
+  </p>
+</div>

@@ -1,6 +1,6 @@
 <li class="review-card">
   <div class="review-meta">
-    <strong><%= review.rating %>/5</strong> — <%= review.user.email_address %>
+    <strong><%= "★" * review.rating %><%= "☆" * (5 - review.rating) %></strong> — <%= review.user.email_address %>
   </div>
   <p><%= simple_format(review.body) %></p>
   <% if Current.user == review.user %>

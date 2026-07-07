@@ -30,7 +30,12 @@
     <%= form.label :genre_ids, "Genres" %>
     <ul class="checkbox-list">
       <%= form.collection_check_boxes :genre_ids, Genre.order(:name), :id, :name do |b| %>
-        <li><%= b.check_box %> <%= b.label %></li>
+        <li>
+          <%= b.label do %>
+            <%= b.check_box %>
+            <%= b.text %>
+          <% end %>
+        </li>
       <% end %>
     </ul>
   </div>
