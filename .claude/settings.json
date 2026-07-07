@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "path=$(jq -r '.tool_input.file_path'); if echo \"$path\" | grep -q '\\.rb$'; then echo \"Ruby file edited. Running RSpec...\"; bundle exec rspec; fi"
+          }
+        ]
+      }
+    ]
+  }
+}
