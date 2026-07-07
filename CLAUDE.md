@@ -34,7 +34,7 @@ bin/rails test test/models/foo_test.rb:12           # run a single test at a lin
 bin/rails db:test:prepare test:system               # run system tests (Capybara + Selenium)
 ```
 
-An `rspec-rails` setup also exists under `spec/` (`rspec spec/models/user_spec.rb`, `spec/requests/books_spec.rb`) but is not yet wired into CI — treat `test/` (Minitest) as the authoritative suite unless told otherwise. A project-scoped skill at `.claude/skills/rspec-conventions/SKILL.md` documents how specs under `spec/` should be written (request specs preferred over controller specs, `let` over instance variables, assert response + DB change together) if asked to add to that suite.
+An `rspec-rails` setup also exists under `spec/` (`rspec spec/models/user_spec.rb`, `spec/requests/books_spec.rb`) and is wired into CI via the `rspec` job — but `test/` (Minitest) remains the authoritative/primary suite unless told otherwise; `spec/` is a secondary suite covering the same models/requests with RSpec conventions. A project-scoped skill at `.claude/skills/rspec-conventions/SKILL.md` documents how specs under `spec/` should be written (request specs preferred over controller specs, `let` over instance variables, assert response + DB change together) if asked to add to that suite.
 
 Lint:
 ```
@@ -58,7 +58,7 @@ bin/rails db:seed
 
 ## CI
 
-`.github/workflows/ci.yml` runs four jobs on every PR/push to `main`: `scan_ruby` (brakeman + bundler-audit), `scan_js` (importmap audit), `lint` (rubocop), `test`, and `system-test`. Match these locally before pushing.
+`.github/workflows/ci.yml` runs six jobs on every PR/push to `main`: `scan_ruby` (brakeman + bundler-audit), `scan_js` (importmap audit), `lint` (rubocop), `test` (Minitest), `rspec` (RSpec suite under `spec/`), and `system-test`. Match these locally before pushing.
 
 ## Testing policy
 
