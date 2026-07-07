@@ -60,6 +60,10 @@ bin/rails db:seed
 
 `.github/workflows/ci.yml` runs four jobs on every PR/push to `main`: `scan_ruby` (brakeman + bundler-audit), `scan_js` (importmap audit), `lint` (rubocop), `test`, and `system-test`. Match these locally before pushing.
 
+## Testing policy
+
+Whenever a new feature is added (models, controllers, business rules), write exhaustive test coverage for it — not just the happy path. Leave no stone unturned: cover valid/invalid inputs, every validation (presence/uniqueness/inclusion), ownership-scoped access (can't load/edit/destroy another user's record), unauthenticated-access rules, nested-resource business-rule guards (e.g. `Review`'s self-review/duplicate-review blocks), and DB-level constraints (unique-index race conditions), mirroring the depth already established for `Book`/`Review`. Follow `test/`'s Minitest conventions (authoritative suite) or `.claude/skills/rspec-conventions/SKILL.md` if writing under `spec/`.
+
 ## Architecture notes
 
 - Standard Rails autoloading: `app/models`, `app/controllers`, `app/jobs`, `app/mailers`, plus `config.autoload_lib` for `lib/` (excluding `lib/assets`, `lib/tasks`).
