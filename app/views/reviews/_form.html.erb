@@ -1,7 +1,7 @@
-<%= tag.div(flash[:alert], style: "color:red") if flash[:alert] %>
+<%= tag.div(flash[:alert], class: "flash alert") if flash[:alert] %>
 
 <% if review.errors.any? %>
-  <div style="color:red">
+  <div class="errors">
     <ul>
       <% review.errors.full_messages.each do |message| %>
         <li><%= message %></li>
@@ -11,11 +11,15 @@
 <% end %>
 
 <%= form_with model: [ book, review ] do |form| %>
-  <%= form.label :rating %><br>
-  <%= form.select :rating, (1..5).to_a, prompt: "Select a rating" %><br>
+  <div class="field">
+    <%= form.label :rating %>
+    <%= form.select :rating, (1..5).to_a, prompt: "Select a rating" %>
+  </div>
 
-  <%= form.label :body %><br>
-  <%= form.text_area :body, required: true %><br>
+  <div class="field">
+    <%= form.label :body %>
+    <%= form.text_area :body, required: true %>
+  </div>
 
   <%= form.submit %>
 <% end %>

@@ -1,7 +1,7 @@
-<%= tag.div(flash[:alert], style: "color:red") if flash[:alert] %>
+<%= tag.div(flash[:alert], class: "flash alert") if flash[:alert] %>
 
 <% if book.errors.any? %>
-  <div style="color:red">
+  <div class="errors">
     <ul>
       <% book.errors.full_messages.each do |message| %>
         <li><%= message %></li>
@@ -11,17 +11,29 @@
 <% end %>
 
 <%= form_with model: book do |form| %>
-  <%= form.label :title %><br>
-  <%= form.text_field :title, required: true %><br>
+  <div class="field">
+    <%= form.label :title %>
+    <%= form.text_field :title, required: true %>
+  </div>
 
-  <%= form.label :author %><br>
-  <%= form.text_field :author, required: true %><br>
+  <div class="field">
+    <%= form.label :author %>
+    <%= form.text_field :author, required: true %>
+  </div>
 
-  <%= form.label :description %><br>
-  <%= form.text_area :description %><br>
+  <div class="field">
+    <%= form.label :description %>
+    <%= form.text_area :description %>
+  </div>
 
-  <%= form.label :genre_ids, "Genres" %><br>
-  <%= form.collection_check_boxes :genre_ids, Genre.order(:name), :id, :name %><br>
+  <div class="field">
+    <%= form.label :genre_ids, "Genres" %>
+    <ul class="checkbox-list">
+      <%= form.collection_check_boxes :genre_ids, Genre.order(:name), :id, :name do |b| %>
+        <li><%= b.check_box %> <%= b.label %></li>
+      <% end %>
+    </ul>
+  </div>
 
   <%= form.submit %>
 <% end %>

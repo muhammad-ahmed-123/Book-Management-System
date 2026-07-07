@@ -5,6 +5,7 @@ Capybara.register_driver :headless_chrome_no_password_manager do |app|
   options.add_argument("--headless=new")
   options.add_argument("--disable-gpu")
   options.add_argument("--no-sandbox")
+  options.add_argument("--disable-dev-shm-usage")
   options.add_argument("--disable-search-engine-choice-screen")
   # Our specs repeatedly sign in with the same fixture credentials; without this,
   # Chrome's save/update-password prompt intermittently steals focus mid-test and

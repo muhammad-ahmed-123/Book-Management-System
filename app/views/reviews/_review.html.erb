@@ -1,8 +1,12 @@
-<div>
-  <strong><%= review.rating %>/5</strong> — <%= review.user.email_address %>
+<li class="review-card">
+  <div class="review-meta">
+    <strong><%= review.rating %>/5</strong> — <%= review.user.email_address %>
+  </div>
   <p><%= simple_format(review.body) %></p>
   <% if Current.user == review.user %>
-    <%= link_to "Edit your review", edit_book_review_path(review.book, review) %>
-    <%= button_to "Delete your review", book_review_path(review.book, review), method: :delete, data: { confirm: "Are you sure?" } %>
+    <div class="review-actions">
+      <%= link_to "Edit your review", edit_book_review_path(review.book, review), class: "btn" %>
+      <%= button_to "Delete your review", book_review_path(review.book, review), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger" %>
+    </div>
   <% end %>
-</div>
+</li>

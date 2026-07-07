@@ -1,0 +1,14 @@
+<header class="site-navbar">
+  <nav class="container site-navbar__inner">
+    <%= link_to "Day5", root_path, class: "site-navbar__brand" %>
+    <div class="site-navbar__links">
+      <% if authenticated? %>
+        <%= link_to "New Book", new_book_path, class: "btn btn-primary" %>
+        <%= button_to "Sign Out", session_path, method: :delete, class: "btn" %>
+      <% else %>
+        <%= link_to "Sign In", new_session_path, class: "btn" %>
+        <%= link_to "Sign Up", new_registration_path, class: "btn btn-primary" %>
+      <% end %>
+    </div>
+  </nav>
+</header>

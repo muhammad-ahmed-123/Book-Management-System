@@ -1,26 +1,32 @@
 <% content_for :title, "Books" %>
 
-<%= tag.div(flash[:alert], style: "color:red") if flash[:alert] %>
-<%= tag.div(flash[:notice], style: "color:green") if flash[:notice] %>
+<%= tag.div(flash[:alert], class: "flash alert") if flash[:alert] %>
+<%= tag.div(flash[:notice], class: "flash notice") if flash[:notice] %>
 
-<h1>Books</h1>
-
-<% if authenticated? %>
-  <%= link_to "New Book", new_book_path %>
-  <%= button_to "Sign Out", session_path, method: :delete %>
+<% unless authenticated? %>
+  <section class="hero">
+    <h1 class="hero__title">Track every book you read.</h1>
+    <p class="hero__subtitle">Day5 helps you catalog books, organize them by genre, and share honest reviews with a community of readers.</p>
+    <div class="hero__actions">
+      <%= link_to "Sign Up", new_registration_path, class: "btn btn-primary" %>
+      <%= link_to "Sign In", new_session_path, class: "btn" %>
+    </div>
+  </section>
 <% else %>
-  <%= link_to "Sign In", new_session_path %>
-  <%= link_to "Sign Up", new_registration_path %>
+  <h1>Books</h1>
 <% end %>
 
-<ul>
+<ul class="book-grid">
   <% @books.each do |book| %>
-    <li>
-      <%= link_to book.title, book %> by <%= book.author %>
-      (Genres: <%= book.genres.any? ? book.genres.map(&:name).sort.join(", ") : content_tag(:em, "None") %>)
+    <li class="book-card">
+      <h3><%= link_to book.title, book %></h3>
+      <p>by <%= book.author %></p>
+      <p>Genres: <%= book.genres.any? ? book.genres.map(&:name).sort.join(", ") : content_tag(:em, "None") %></p>
       <% if Current.user == book.user %>
-        <%= link_to "Edit", edit_book_path(book) %>
-        <%= button_to "Delete", book, method: :delete, data: { confirm: "Are you sure?" } %>
+        <div class="book-actions">
+          <%= link_to "Edit", edit_book_path(book), class: "btn" %>
+          <%= button_to "Delete", book, method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger" %>
+        </div>
       <% end %>
     </li>
   <% end %>

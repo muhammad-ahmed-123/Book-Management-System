@@ -64,6 +64,10 @@ bin/rails db:seed
 
 Whenever a new feature is added (models, controllers, business rules), write exhaustive test coverage for it — not just the happy path. Leave no stone unturned: cover valid/invalid inputs, every validation (presence/uniqueness/inclusion), ownership-scoped access (can't load/edit/destroy another user's record), unauthenticated-access rules, nested-resource business-rule guards (e.g. `Review`'s self-review/duplicate-review blocks), and DB-level constraints (unique-index race conditions), mirroring the depth already established for `Book`/`Review`. Follow `test/`'s Minitest conventions (authoritative suite) or `.claude/skills/rspec-conventions/SKILL.md` if writing under `spec/`.
 
+## UI policy
+
+Every page/view must be responsive across mobile, tablet, and desktop screen sizes — not desktop-only. Build on the mobile-first foundation in `app/assets/stylesheets/application.css` (`container`, `site-nav`, `book-grid`, `btn`, `form-group`/`field` classes, breakpoints at 600px and 1024px) rather than inline `style=` attributes or fixed pixel widths, and reuse existing classes before adding new ones.
+
 ## Architecture notes
 
 - Standard Rails autoloading: `app/models`, `app/controllers`, `app/jobs`, `app/mailers`, plus `config.autoload_lib` for `lib/` (excluding `lib/assets`, `lib/tasks`).

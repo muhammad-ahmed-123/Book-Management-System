@@ -1,29 +1,35 @@
 <% content_for :title, @book.title %>
 
-<%= tag.div(flash[:alert], style: "color:red") if flash[:alert] %>
-<%= tag.div(flash[:notice], style: "color:green") if flash[:notice] %>
+<%= tag.div(flash[:alert], class: "flash alert") if flash[:alert] %>
+<%= tag.div(flash[:notice], class: "flash notice") if flash[:notice] %>
 
-<h1><%= @book.title %></h1>
-<p>by <%= @book.author %></p>
-<p><%= simple_format(@book.description) if @book.description.present? %></p>
-<p>
-  Genres:
-  <% if @book.genres.any? %>
-    <%= @book.genres.order(:name).pluck(:name).join(", ") %>
-  <% else %>
-    <em>None</em>
-  <% end %>
-</p>
+<div class="book-detail">
+  <h1><%= @book.title %></h1>
+  <p>by <%= @book.author %></p>
+  <p><%= simple_format(@book.description) if @book.description.present? %></p>
+  <p>
+    Genres:
+    <% if @book.genres.any? %>
+      <%= @book.genres.order(:name).pluck(:name).join(", ") %>
+    <% else %>
+      <em>None</em>
+    <% end %>
+  </p>
+</div>
 
 <% if Current.user == @book.user %>
-  <%= link_to "Edit", edit_book_path(@book) %>
-  <%= button_to "Delete", @book, method: :delete, data: { confirm: "Are you sure?" } %>
+  <div class="book-actions">
+    <%= link_to "Edit", edit_book_path(@book), class: "btn" %>
+    <%= button_to "Delete", @book, method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger" %>
+  </div>
 <% end %>
 
 <h2>Reviews</h2>
 
 <% if @reviews.any? %>
-  <%= render @reviews %>
+  <ul class="review-list">
+    <%= render @reviews %>
+  </ul>
 <% else %>
   <p>No reviews yet.</p>
 <% end %>
@@ -32,10 +38,10 @@
   <% if Current.user == @book.user %>
     <p><em>You can't review your own book.</em></p>
   <% elsif @current_user_review %>
-    <%= link_to "Edit your review", edit_book_review_path(@book, @current_user_review) %>
+    <%= link_to "Edit your review", edit_book_review_path(@book, @current_user_review), class: "btn" %>
   <% else %>
-    <%= link_to "Write a Review", new_book_review_path(@book) %>
+    <%= link_to "Write a Review", new_book_review_path(@book), class: "btn btn-primary" %>
   <% end %>
 <% end %>
 
-<%= link_to "Back to Books", books_path %>
+<%= link_to "Back to Books", books_path, class: "btn" %>
