@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   resources :passwords, param: :token
   resources :books do
     resources :reviews, only: %i[ new create edit update destroy ]
+    resource :favourite, only: %i[ create destroy ]
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
