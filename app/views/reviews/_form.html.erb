@@ -21,5 +21,8 @@
     <%= form.text_area :body, required: true %>
   </div>
 
-  <%= form.submit %>
+  <div class="form-actions">
+    <%= form.submit %>
+    <%= link_to "Back to Book", book, class: "btn" %>
+  </div>
 <% end %>

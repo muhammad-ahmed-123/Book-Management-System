@@ -40,5 +40,8 @@
     </ul>
   </div>
 
-  <%= form.submit %>
+  <div class="form-actions">
+    <%= form.submit %>
+    <%= link_to "Back to Books", books_path, class: "btn" %>
+  </div>
 <% end %>

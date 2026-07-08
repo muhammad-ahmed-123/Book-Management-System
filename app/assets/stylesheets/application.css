@@ -316,6 +316,8 @@ form { max-width: 34rem; }
 
 .field { margin-bottom: 1.25rem; }
 
+.form-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-top: 1.5rem; }
+
 .field label {
   display: block;
   font-family: var(--font-ui);
