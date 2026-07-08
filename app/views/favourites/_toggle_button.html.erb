@@ -1,0 +1,5 @@
+<% if favourited %>
+  <%= button_to "♥ Remove from Favourites", book_favourite_path(book), method: :delete, class: "btn favourite-btn" %>
+<% else %>
+  <%= button_to "♡ Add to Favourites", book_favourite_path(book), method: :post, class: "btn btn-primary favourite-btn" %>
+<% end %>

@@ -231,4 +231,53 @@ RSpec.describe "Favourites", type: :request do
       end
     end
   end
+
+  describe "GET /favourites" do
+    context "when the visitor is not signed in" do
+      it "redirects to sign in" do
+        get favourites_path
+
+        expect(response).to redirect_to(new_session_path)
+      end
+    end
+
+    context "when the current user has favourited books" do
+      it "lists only the current user's favourited books" do
+        other_book = Book.create!(title: "Clean Code", author: "Robert C. Martin", user: other_user, genres: [ genre ])
+        favourite
+        Favourite.create!(book: other_book, user: other_user)
+        sign_in(fan)
+
+        get favourites_path
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include(book.title)
+        expect(response.body).not_to include(other_book.title)
+      end
+    end
+
+    context "when the current user has not favourited any books" do
+      it "shows an empty state instead of an empty grid" do
+        sign_in(fan)
+
+        get favourites_path
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include("haven't favourited")
+      end
+    end
+
+    context "ordering" do
+      it "lists the most recently favourited book first" do
+        second_book = Book.create!(title: "Clean Code", author: "Robert C. Martin", user: owner, genres: [ genre ])
+        favourite
+        travel_to(1.hour.from_now) { Favourite.create!(book: second_book, user: fan) }
+        sign_in(fan)
+
+        get favourites_path
+
+        expect(response.body.index(second_book.title)).to be < response.body.index(book.title)
+      end
+    end
+  end
 end

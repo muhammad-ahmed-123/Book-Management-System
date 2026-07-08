@@ -5,6 +5,7 @@ class BooksController < ApplicationController
 
   def index
     @books = Book.includes(:genres).order(created_at: :desc)
+    @favourited_book_ids = authenticated? ? Current.user.favourite_books.ids.to_set : Set.new
   end
 
   def show

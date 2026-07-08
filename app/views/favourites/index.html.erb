@@ -1,0 +1,35 @@
+<% content_for :title, "My Favourites" %>
+
+<%= tag.div(flash[:alert], class: "flash alert") if flash[:alert] %>
+<%= tag.div(flash[:notice], class: "flash notice") if flash[:notice] %>
+
+<p class="section-label">My favourites</p>
+
+<% if @books.any? %>
+  <ul class="book-grid">
+    <% @books.each do |book| %>
+      <li class="book-card">
+        <h3><%= link_to book.title, book %></h3>
+        <p>by <%= book.author %></p>
+        <% if book.genres.any? %>
+          <div class="genre-tags">
+            <% book.genres.order(:name).each do |genre| %>
+              <span class="genre-tag"><%= genre.name %></span>
+            <% end %>
+          </div>
+        <% end %>
+        <div class="book-favourite">
+          <%= render "favourites/toggle_button", book: book, favourited: true %>
+        </div>
+        <% if Current.user == book.user %>
+          <div class="book-actions">
+            <%= link_to "Edit", edit_book_path(book), class: "btn" %>
+            <%= button_to "Delete", book, method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger" %>
+          </div>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>You haven't favourited any books yet. <%= link_to "Browse books", books_path %>.</p>
+<% end %>

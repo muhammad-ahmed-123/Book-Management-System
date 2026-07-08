@@ -1,8 +1,12 @@
 class FavouritesController < ApplicationController
   rescue_from ActiveRecord::RecordNotUnique, with: :handle_duplicate_favourite_race
 
-  before_action :set_book
+  before_action :set_book, only: %i[ create destroy ]
   before_action :set_own_favourite, only: %i[ destroy ]
+
+  def index
+    @books = Current.user.favourite_books.includes(:genres).order("favourites.created_at DESC")
+  end
 
   def create
     @favourite = Current.user.favourites.build(book: @book)

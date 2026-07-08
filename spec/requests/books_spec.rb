@@ -20,6 +20,38 @@ RSpec.describe "Books", type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include(book.title)
     end
+
+    context "when the visitor is not signed in" do
+      it "does not show a favourite toggle button" do
+        book
+
+        get books_path
+
+        expect(response.body).not_to include("Favourites")
+      end
+    end
+
+    context "when the current user has not favourited the book" do
+      it "shows an Add to Favourites button" do
+        book
+        sign_in(other_user)
+
+        get books_path
+
+        expect(response.body).to include("Add to Favourites")
+      end
+    end
+
+    context "when the current user has favourited the book" do
+      it "shows a Remove from Favourites button" do
+        Favourite.create!(book: book, user: other_user)
+        sign_in(other_user)
+
+        get books_path
+
+        expect(response.body).to include("Remove from Favourites")
+      end
+    end
   end
 
   describe "GET /books/:id" do

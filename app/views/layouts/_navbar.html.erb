@@ -3,6 +3,7 @@
     <%= link_to "Marginalia", root_path, class: "site-navbar__brand" %>
     <div class="site-navbar__links">
       <% if authenticated? %>
+        <%= link_to "My Favourites", favourites_path, class: "btn" %>
         <%= link_to "New Book", new_book_path, class: "btn btn-primary" %>
         <%= button_to "Sign Out", session_path, method: :delete, class: "btn" %>
       <% else %>

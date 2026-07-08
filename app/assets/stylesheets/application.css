@@ -405,6 +405,9 @@ form { max-width: 34rem; }
 
 .book-card .book-actions { margin-top: 0.35rem; display: flex; flex-wrap: wrap; gap: 0.9rem; }
 
+.book-favourite { display: flex; margin: 1.5rem 0; }
+.book-card .book-favourite { margin: 0.35rem 0 0; }
+
 /* Inline owner controls on cards = quiet text links, not full buttons */
 .book-card .book-actions .btn {
   min-height: 0;

@@ -28,6 +28,11 @@
           <% end %>
         </div>
       <% end %>
+      <% if authenticated? %>
+        <div class="book-favourite">
+          <%= render "favourites/toggle_button", book: book, favourited: @favourited_book_ids.include?(book.id) %>
+        </div>
+      <% end %>
       <% if Current.user == book.user %>
         <div class="book-actions">
           <%= link_to "Edit", edit_book_path(book), class: "btn" %>
