@@ -5,6 +5,7 @@ class User < ApplicationRecord
   has_many :reviews, dependent: :destroy
   has_many :favourites, dependent: :destroy
   has_many :favourite_books, through: :favourites, source: :book
+  has_many :comments, dependent: :destroy
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 

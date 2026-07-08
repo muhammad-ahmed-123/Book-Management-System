@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_08_114101) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_08_141937) do
   create_table "book_genres", force: :cascade do |t|
     t.integer "book_id", null: false
     t.datetime "created_at", null: false
@@ -29,6 +29,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_08_114101) do
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
     t.index ["user_id"], name: "index_books_on_user_id"
+  end
+
+  create_table "comments", force: :cascade do |t|
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.integer "review_id", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["review_id"], name: "index_comments_on_review_id"
+    t.index ["user_id"], name: "index_comments_on_user_id"
   end
 
   create_table "favourites", force: :cascade do |t|
@@ -80,6 +90,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_08_114101) do
   add_foreign_key "book_genres", "books"
   add_foreign_key "book_genres", "genres"
   add_foreign_key "books", "users"
+  add_foreign_key "comments", "reviews"
+  add_foreign_key "comments", "users"
   add_foreign_key "favourites", "books"
   add_foreign_key "favourites", "users"
   add_foreign_key "reviews", "books"

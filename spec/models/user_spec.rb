@@ -115,6 +115,19 @@ RSpec.describe User, type: :model do
 
       expect(user.favourite_books).to contain_exactly(book)
     end
+
+    it "destroys its comments when the user is destroyed" do
+      user.save!
+      genre = Genre.create!(name: "Fiction")
+      book_owner = User.create!(email_address: "owner@gmail.com", password: "Secret_123")
+      book = Book.create!(title: "A Title", author: "An Author", user: book_owner, genres: [ genre ])
+      review = Review.create!(book: book, user: book_owner, rating: 4, body: "Good read")
+      comment = Comment.create!(review: review, user: user, body: "I agree.")
+
+      user.destroy
+
+      expect(Comment.find_by(id: comment.id)).to be_nil
+    end
   end
 
   describe "#authenticate" do

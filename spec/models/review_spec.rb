@@ -52,5 +52,15 @@ RSpec.describe Review, type: :model do
 
       expect(review.user).to eq(reviewer)
     end
+
+    it "destroys its comments when the review is destroyed" do
+      review.save!
+      commenter = User.create!(email_address: "commenter@gmail.com", password: "Secret_123")
+      comment = Comment.create!(review: review, user: commenter, body: "Nice review!")
+
+      review.destroy
+
+      expect(Comment.find_by(id: comment.id)).to be_nil
+    end
   end
 end
