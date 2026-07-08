@@ -28,19 +28,12 @@ bin/dev                 # starts the Rails server
 
 ## Tests
 
-The Minitest suite under `test/` is authoritative and what CI runs:
+The RSpec suite under `spec/` is authoritative and what CI runs:
 
 ```
-bin/rails db:test:prepare test        # run the test suite
-bin/rails test test/models/foo_test.rb              # a single test file
-bin/rails test test/models/foo_test.rb:12           # a single test at a line
-bin/rails db:test:prepare test:system               # system tests (Capybara + Selenium)
-```
-
-An `rspec-rails` setup also exists under `spec/` (not yet wired into CI):
-
-```
-bundle exec rspec spec/models/user_spec.rb
+bin/rails db:test:prepare
+bundle exec rspec                              # run the full suite
+bundle exec rspec spec/models/user_spec.rb     # a single spec file
 bundle exec rspec spec/requests/books_spec.rb
 ```
 
@@ -57,7 +50,7 @@ bin/importmap audit            # vulnerability scan of JS deps pinned in config/
 
 ## CI
 
-`.github/workflows/ci.yml` runs on every PR/push to `main`: `scan_ruby` (brakeman + bundler-audit), `scan_js` (importmap audit), `lint` (rubocop), `test`, and `system-test`.
+`.github/workflows/ci.yml` runs on every PR/push to `main`: `scan_ruby` (brakeman + bundler-audit), `scan_js` (importmap audit), `lint` (rubocop), and `rspec` (the RSpec suite under `spec/`).
 
 ## Console / db
 

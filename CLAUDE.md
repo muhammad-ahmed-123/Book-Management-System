@@ -26,15 +26,15 @@ Run the dev server:
 bin/dev                 # starts Rails server (foreman/Procfile.dev if present, else rails server)
 ```
 
-Tests (Minitest — the suite CI runs):
+Tests (RSpec — the authoritative suite, wired into CI via the `rspec` job):
 ```
-bin/rails db:test:prepare test      # run the test suite
-bin/rails test test/models/foo_test.rb              # run a single test file
-bin/rails test test/models/foo_test.rb:12           # run a single test at a line
-bin/rails db:test:prepare test:system               # run system tests (Capybara + Selenium)
+bin/rails db:test:prepare
+bundle exec rspec                              # run the full suite
+bundle exec rspec spec/models/user_spec.rb     # run a single spec file
+bundle exec rspec spec/requests/books_spec.rb
 ```
 
-An `rspec-rails` setup also exists under `spec/` (`rspec spec/models/user_spec.rb`, `spec/requests/books_spec.rb`) and is wired into CI via the `rspec` job — but `test/` (Minitest) remains the authoritative/primary suite unless told otherwise; `spec/` is a secondary suite covering the same models/requests with RSpec conventions. A project-scoped skill at `.claude/skills/rspec-conventions/SKILL.md` documents how specs under `spec/` should be written (request specs preferred over controller specs, `let` over instance variables, assert response + DB change together) if asked to add to that suite.
+The `test/` (Minitest) suite has been removed; `spec/` is now the only and primary test suite. A project-scoped skill at `.claude/skills/rspec-conventions/SKILL.md` documents how specs under `spec/` should be written (request specs preferred over controller specs, `let` over instance variables, assert response + DB change together) — follow it for any new/updated spec.
 
 Lint:
 ```
@@ -58,11 +58,11 @@ bin/rails db:seed
 
 ## CI
 
-`.github/workflows/ci.yml` runs six jobs on every PR/push to `main`: `scan_ruby` (brakeman + bundler-audit), `scan_js` (importmap audit), `lint` (rubocop), `test` (Minitest), `rspec` (RSpec suite under `spec/`), and `system-test`. Match these locally before pushing.
+`.github/workflows/ci.yml` runs four jobs on every PR/push to `main`: `scan_ruby` (brakeman + bundler-audit), `scan_js` (importmap audit), `lint` (rubocop), and `rspec` (the RSpec suite under `spec/`, the authoritative test suite). Match these locally before pushing.
 
 ## Testing policy
 
-Whenever a new feature is added (models, controllers, business rules), write exhaustive test coverage for it — not just the happy path. Leave no stone unturned: cover valid/invalid inputs, every validation (presence/uniqueness/inclusion), ownership-scoped access (can't load/edit/destroy another user's record), unauthenticated-access rules, nested-resource business-rule guards (e.g. `Review`'s self-review/duplicate-review blocks), and DB-level constraints (unique-index race conditions), mirroring the depth already established for `Book`/`Review`. Follow `test/`'s Minitest conventions (authoritative suite) or `.claude/skills/rspec-conventions/SKILL.md` if writing under `spec/`.
+Whenever a new feature is added (models, controllers, business rules), write exhaustive test coverage for it — not just the happy path. Leave no stone unturned: cover valid/invalid inputs, every validation (presence/uniqueness/inclusion), ownership-scoped access (can't load/edit/destroy another user's record), unauthenticated-access rules, nested-resource business-rule guards (e.g. `Review`'s self-review/duplicate-review blocks), and DB-level constraints (unique-index race conditions), mirroring the depth already established for `Book`/`Review`. Follow `.claude/skills/rspec-conventions/SKILL.md` conventions for specs under `spec/` (the authoritative suite).
 
 ## UI policy
 
