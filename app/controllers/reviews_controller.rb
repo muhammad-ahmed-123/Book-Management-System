@@ -33,8 +33,11 @@ class ReviewsController < ApplicationController
   end
 
   def destroy
-    @review.destroy!
-    redirect_to @book, notice: "Review was successfully deleted.", status: :see_other
+    if @review.destroy
+      redirect_to @book, notice: "Review was successfully deleted.", status: :see_other
+    else
+      redirect_to @book, alert: "Review couldn't be deleted. Please try again."
+    end
   end
 
   private

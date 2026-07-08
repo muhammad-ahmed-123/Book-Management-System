@@ -44,8 +44,11 @@ class BooksController < ApplicationController
   end
 
   def destroy
-    @book.destroy
-    redirect_to books_path, notice: "Book was successfully deleted.", status: :see_other
+    if @book.destroy
+      redirect_to books_path, notice: "Book was successfully deleted.", status: :see_other
+    else
+      redirect_to @book, alert: "Book couldn't be deleted. Please try again."
+    end
   end
 
   private
@@ -68,7 +71,7 @@ class BooksController < ApplicationController
     end
 
     def sanitized_genre_ids
-      Array(book_params[:genre_ids]).reject(&:blank?)
+      Array(book_params[:genre_ids]).reject(&:blank?).uniq
     end
 
     def book_params_with_sanitized_genre_ids

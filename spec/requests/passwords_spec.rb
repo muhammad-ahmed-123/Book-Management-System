@@ -4,6 +4,28 @@ RSpec.describe "Passwords", type: :request do
   let(:user) { User.create!(email_address: "owner@gmail.com", password: "Original_Pw1") }
   let(:token) { user.password_reset_token }
 
+  describe "POST /passwords" do
+    context "when the email address belongs to an existing user" do
+      it "shows a generic confirmation notice" do
+        post passwords_path, params: { email_address: user.email_address }
+
+        expect(response).to redirect_to(new_session_path)
+        follow_redirect!
+        expect(flash[:notice]).to eq("Password reset instructions sent (if user with that email address exists).")
+      end
+    end
+
+    context "when the email address does not belong to any user" do
+      it "shows the identical generic notice, not a different message" do
+        post passwords_path, params: { email_address: "nobody@gmail.com" }
+
+        expect(response).to redirect_to(new_session_path)
+        follow_redirect!
+        expect(flash[:notice]).to eq("Password reset instructions sent (if user with that email address exists).")
+      end
+    end
+  end
+
   describe "PATCH /passwords/:token" do
     context "when the submitted password is blank" do
       it "does not change the password and does not destroy other sessions" do
@@ -60,6 +82,31 @@ RSpec.describe "Passwords", type: :request do
         patch password_path("bogus-token"), params: { password: "NewValid_Pass1", password_confirmation: "NewValid_Pass1" }
 
         expect(response).to redirect_to(new_password_path)
+      end
+    end
+
+    context "when the token has expired" do
+      it "redirects to the new password request page instead of raising" do
+        valid_token = token
+
+        travel(16.minutes) do
+          patch password_path(valid_token), params: { password: "NewValid_Pass1", password_confirmation: "NewValid_Pass1" }
+        end
+
+        expect(response).to redirect_to(new_password_path)
+      end
+    end
+
+    context "when the token is valid but the user no longer exists" do
+      it "redirects to the new password request page instead of raising" do
+        valid_token = token
+        user.destroy
+
+        patch password_path(valid_token), params: { password: "NewValid_Pass1", password_confirmation: "NewValid_Pass1" }
+
+        expect(response).to redirect_to(new_password_path)
+        follow_redirect!
+        expect(flash[:alert]).to eq("Password reset link is invalid or has expired.")
       end
     end
   end

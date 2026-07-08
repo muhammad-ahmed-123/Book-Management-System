@@ -50,6 +50,16 @@ RSpec.describe "Books", type: :request do
         expect(response).to redirect_to(books_path)
       end
     end
+
+    context "when the id is negative, zero, or oversized" do
+      it "redirects to the books list instead of raising" do
+        [ -1, 0, 99_999_999_999_999_999_999 ].each do |bad_id|
+          get "/books/#{bad_id}"
+
+          expect(response).to redirect_to(books_path)
+        end
+      end
+    end
   end
 
   describe "POST /books" do
@@ -109,6 +119,19 @@ RSpec.describe "Books", type: :request do
           }.not_to change(Book, :count)
 
           expect(response).to have_http_status(:unprocessable_content)
+        end
+      end
+
+      context "when the same genre is submitted more than once" do
+        it "creates the book with the genre assigned only once instead of crashing" do
+          sign_in(owner)
+
+          expect {
+            post books_path, params: { book: { title: "New Book", author: "Owner", genre_ids: [ fiction.id.to_s, fiction.id.to_s ] } }
+          }.to change(Book, :count).by(1)
+
+          expect(response).to redirect_to(Book.last)
+          expect(Book.last.genres).to contain_exactly(fiction)
         end
       end
     end
@@ -195,6 +218,22 @@ RSpec.describe "Books", type: :request do
         }.not_to change(Book, :count)
 
         expect(response).to redirect_to(books_path)
+      end
+    end
+
+    context "when the destroy fails" do
+      it "shows a failure alert instead of crashing" do
+        sign_in(owner)
+        book
+        allow_any_instance_of(Book).to receive(:destroy).and_return(false)
+
+        expect {
+          delete book_path(book)
+        }.not_to change(Book, :count)
+
+        expect(response).to redirect_to(book_path(book))
+        follow_redirect!
+        expect(flash[:alert]).to eq("Book couldn't be deleted. Please try again.")
       end
     end
   end

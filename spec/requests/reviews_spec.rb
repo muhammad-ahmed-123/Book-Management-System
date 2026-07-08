@@ -59,6 +59,18 @@ RSpec.describe "Reviews", type: :request do
         expect(response).to redirect_to(books_path)
       end
     end
+
+    context "when the book_id is negative, zero, or oversized" do
+      it "redirects to the books list instead of raising" do
+        sign_in(reviewer)
+
+        [ -1, 0, 99_999_999_999_999_999_999 ].each do |bad_id|
+          get new_book_review_path(bad_id)
+
+          expect(response).to redirect_to(books_path)
+        end
+      end
+    end
   end
 
   describe "POST /books/:book_id/reviews" do
@@ -154,6 +166,18 @@ RSpec.describe "Reviews", type: :request do
         expect(response).to have_http_status(:unprocessable_content)
       end
     end
+
+    context "when rating is submitted as an array instead of a scalar" do
+      it "is neutralized by strong params and re-renders as unprocessable instead of crashing" do
+        sign_in(reviewer)
+
+        expect {
+          post book_reviews_path(book), params: { review: { rating: [ "1", "2" ], body: "x" } }
+        }.not_to change(Review, :count)
+
+        expect(response).to have_http_status(:unprocessable_content)
+      end
+    end
   end
 
   describe "PATCH /books/:book_id/reviews/:id" do
@@ -210,6 +234,33 @@ RSpec.describe "Reviews", type: :request do
         expect(flash[:alert]).to eq("You are not authorized to edit that review.")
       end
     end
+
+    context "when the review belongs to the current user but under a different book_id in the URL" do
+      it "is not treated as authorized and does not load the review" do
+        review
+        other_book = Book.create!(title: "Clean Code", author: "Robert C. Martin", user: other_user, genres: [ genre ])
+        sign_in(reviewer)
+
+        get "/books/#{other_book.id}/reviews/#{review.id}/edit"
+
+        expect(response).to redirect_to(book_path(other_book))
+        follow_redirect!
+        expect(flash[:alert]).to eq("You are not authorized to edit that review.")
+      end
+    end
+
+    context "when the id is negative, zero, or oversized" do
+      it "redirects with an alert instead of raising" do
+        review
+        sign_in(reviewer)
+
+        [ -1, 0, 99_999_999_999_999_999_999 ].each do |bad_id|
+          get "/books/#{book.id}/reviews/#{bad_id}/edit"
+
+          expect(response).to redirect_to(book_path(book))
+        end
+      end
+    end
   end
 
   describe "DELETE /books/:book_id/reviews/:id" do
@@ -235,6 +286,22 @@ RSpec.describe "Reviews", type: :request do
         }.not_to change(Review, :count)
 
         expect(response).to redirect_to(book_path(book))
+      end
+    end
+
+    context "when the destroy fails" do
+      it "shows a failure alert instead of crashing" do
+        review
+        sign_in(reviewer)
+        allow_any_instance_of(Review).to receive(:destroy).and_return(false)
+
+        expect {
+          delete book_review_path(book, review)
+        }.not_to change(Review, :count)
+
+        expect(response).to redirect_to(book_path(book))
+        follow_redirect!
+        expect(flash[:alert]).to eq("Review couldn't be deleted. Please try again.")
       end
     end
   end
