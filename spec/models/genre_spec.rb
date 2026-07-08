@@ -28,7 +28,7 @@ RSpec.describe Genre, type: :model do
   describe "#books" do
     it "returns the books associated through book_genres" do
       genre.save!
-      user = User.create!(email_address: "owner@example.com", password: "password")
+      user = User.create!(email_address: "owner@gmail.com", password: "Secret_123")
       book = Book.create!(title: "A Title", author: "An Author", user: user, genres: [ genre ])
 
       expect(genre.books).to contain_exactly(book)

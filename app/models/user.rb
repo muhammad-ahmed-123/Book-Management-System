@@ -6,6 +6,18 @@ class User < ApplicationRecord
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 
-  validates :email_address, presence: true, uniqueness: true
-  validates :password, length: { minimum: 8 }, allow_nil: true
+  validates :email_address,
+    presence: true,
+    uniqueness: true,
+    format: {
+      with: /\A(?=[^@]*[A-Za-z])[A-Za-z0-9._%+-]{1,64}@gmail\.com\z/,
+      message: "must be a @gmail.com address, 1-64 characters before the @, and not numbers only"
+    }
+
+  validates :password,
+    length: { minimum: 8 },
+    format: {
+      with: /\A(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*_).+\z/,
+      message: "must include an uppercase letter, a lowercase letter, a number, and an underscore"
+    }
 end

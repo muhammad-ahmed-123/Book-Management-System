@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe BookGenre, type: :model do
-  let(:user) { User.create!(email_address: "owner@example.com", password: "password") }
+  let(:user) { User.create!(email_address: "owner@gmail.com", password: "Secret_123") }
   let(:genre) { Genre.create!(name: "Fiction") }
   let(:book) { Book.create!(title: "A Title", author: "An Author", user: user, genres: [ genre ]) }
 

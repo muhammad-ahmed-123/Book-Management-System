@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe Book, type: :model do
-  let(:user) { User.create!(email_address: "owner@example.com", password: "password") }
+  let(:user) { User.create!(email_address: "owner@gmail.com", password: "Secret_123") }
   let(:genre) { Genre.create!(name: "Fiction") }
   let(:book) { Book.new(title: "A Title", author: "An Author", user: user, genres: [ genre ]) }
 
@@ -56,7 +56,7 @@ RSpec.describe Book, type: :model do
 
     it "destroys its reviews when the book is destroyed" do
       book.save!
-      reviewer = User.create!(email_address: "reviewer@example.com", password: "password")
+      reviewer = User.create!(email_address: "reviewer@gmail.com", password: "Secret_123")
       review = Review.create!(book: book, user: reviewer, rating: 4, body: "Good")
 
       book.destroy

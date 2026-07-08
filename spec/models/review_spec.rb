@@ -1,8 +1,8 @@
 require "rails_helper"
 
 RSpec.describe Review, type: :model do
-  let(:owner) { User.create!(email_address: "owner@example.com", password: "password") }
-  let(:reviewer) { User.create!(email_address: "reviewer@example.com", password: "password") }
+  let(:owner) { User.create!(email_address: "owner@gmail.com", password: "Secret_123") }
+  let(:reviewer) { User.create!(email_address: "reviewer@gmail.com", password: "Secret_123") }
   let(:genre) { Genre.create!(name: "Fiction") }
   let(:book) { Book.create!(title: "A Title", author: "An Author", user: owner, genres: [ genre ]) }
   let(:review) { Review.new(book: book, user: reviewer, rating: 4, body: "Good read") }

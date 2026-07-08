@@ -1,14 +1,14 @@
 require "rails_helper"
 
 RSpec.describe "Books", type: :request do
-  let(:owner) { User.create!(email_address: "owner@example.com", password: "password") }
-  let(:other_user) { User.create!(email_address: "other@example.com", password: "password") }
+  let(:owner) { User.create!(email_address: "owner@gmail.com", password: "Secret_123") }
+  let(:other_user) { User.create!(email_address: "other@gmail.com", password: "Secret_123") }
   let(:fiction) { Genre.create!(name: "Fiction") }
   let(:mystery) { Genre.create!(name: "Mystery") }
   let(:book) { Book.create!(title: "The Pragmatic Programmer", author: "David Thomas", user: owner, genres: [ fiction ]) }
 
   def sign_in(user)
-    post session_path, params: { email_address: user.email_address, password: "password" }
+    post session_path, params: { email_address: user.email_address, password: "Secret_123" }
   end
 
   describe "GET /books" do
