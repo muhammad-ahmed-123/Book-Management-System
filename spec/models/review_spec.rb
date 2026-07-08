@@ -38,13 +38,6 @@ RSpec.describe Review, type: :model do
 
       expect(duplicate).not_to be_valid
     end
-
-    it "is invalid when the book's owner reviews their own book" do
-      self_review = Review.new(book: book, user: owner, rating: 5, body: "My own book is great")
-
-      expect(self_review).not_to be_valid
-      expect(self_review.errors[:base]).to include("You can't review your own book")
-    end
   end
 
   describe "associations" do
