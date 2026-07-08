@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_06_133253) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_08_114101) do
   create_table "book_genres", force: :cascade do |t|
     t.integer "book_id", null: false
     t.datetime "created_at", null: false
@@ -29,6 +29,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_06_133253) do
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
     t.index ["user_id"], name: "index_books_on_user_id"
+  end
+
+  create_table "favourites", force: :cascade do |t|
+    t.integer "book_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["book_id"], name: "index_favourites_on_book_id"
+    t.index ["user_id", "book_id"], name: "index_favourites_on_user_id_and_book_id", unique: true
+    t.index ["user_id"], name: "index_favourites_on_user_id"
   end
 
   create_table "genres", force: :cascade do |t|
@@ -70,6 +80,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_06_133253) do
   add_foreign_key "book_genres", "books"
   add_foreign_key "book_genres", "genres"
   add_foreign_key "books", "users"
+  add_foreign_key "favourites", "books"
+  add_foreign_key "favourites", "users"
   add_foreign_key "reviews", "books"
   add_foreign_key "reviews", "users"
   add_foreign_key "sessions", "users"

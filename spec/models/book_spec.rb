@@ -105,5 +105,15 @@ RSpec.describe Book, type: :model do
 
       expect(Review.find_by(id: review.id)).to be_nil
     end
+
+    it "destroys its favourites when the book is destroyed" do
+      book.save!
+      fan = User.create!(email_address: "fan@gmail.com", password: "Secret_123")
+      favourite = Favourite.create!(book: book, user: fan)
+
+      book.destroy
+
+      expect(Favourite.find_by(id: favourite.id)).to be_nil
+    end
   end
 end
