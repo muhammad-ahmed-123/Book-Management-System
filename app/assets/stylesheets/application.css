@@ -155,7 +155,32 @@ h2 {
 }
 .site-navbar__brand:hover { color: var(--color-text); }
 
-.site-navbar__links { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.site-navbar__links { display: flex; flex-wrap: wrap; gap: 1.1rem; align-items: center; }
+
+/* Secondary nav actions read as plain links, not a row of boxed buttons */
+.site-navbar__links .btn {
+  min-height: 0;
+  padding: 0.3rem 0;
+  border: none;
+  background: none;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+.site-navbar__links .btn:hover { color: var(--color-text); background: none; }
+
+/* The one primary CTA (Sign Up / New Book) keeps its filled button treatment */
+.site-navbar__links .btn-primary {
+  padding: 0.55rem 1.05rem;
+  min-height: 2.2rem;
+  border: 1.5px solid var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+}
+.site-navbar__links .btn-primary:hover {
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+  color: var(--color-primary-contrast);
+}
 
 /* ---------------------------------------------------------------- Hero */
 
@@ -406,7 +431,7 @@ form { max-width: 34rem; }
 .book-card .book-actions { margin-top: 0.35rem; display: flex; flex-wrap: wrap; gap: 0.9rem; }
 
 .book-favourite { display: flex; margin: 1.5rem 0; }
-.book-card .book-favourite { margin: 0.35rem 0 0; }
+.book-card .book-favourite { margin: auto 0 0; }
 
 /* Inline owner controls on cards = quiet text links, not full buttons */
 .book-card .book-actions .btn {

@@ -92,6 +92,18 @@ RSpec.describe "Books", type: :request do
         end
       end
     end
+
+    context "regardless of favourite state" do
+      it "never shows a favourite toggle button on the book detail page" do
+        Favourite.create!(book: book, user: other_user)
+        sign_in(other_user)
+
+        get book_path(book)
+
+        expect(response.body).not_to include("Add to Favourites")
+        expect(response.body).not_to include("Remove from Favourites")
+      end
+    end
   end
 
   describe "POST /books" do

@@ -18,15 +18,15 @@
             <% end %>
           </div>
         <% end %>
-        <div class="book-favourite">
-          <%= render "favourites/toggle_button", book: book, favourited: true %>
-        </div>
         <% if Current.user == book.user %>
           <div class="book-actions">
             <%= link_to "Edit", edit_book_path(book), class: "btn" %>
             <%= button_to "Delete", book, method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger" %>
           </div>
         <% end %>
+        <div class="book-favourite">
+          <%= render "favourites/toggle_button", book: book, favourited: true %>
+        </div>
       </li>
     <% end %>
   </ul>

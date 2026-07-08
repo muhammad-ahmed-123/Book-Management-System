@@ -315,5 +315,17 @@ RSpec.describe "Reviews", type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include(review.body)
     end
+
+    context "when the current user has already reviewed the book" do
+      it "shows exactly one edit-your-review control, not a duplicate" do
+        review
+        sign_in(reviewer)
+
+        get book_path(book)
+
+        expect(response.body.scan("Edit your review").count).to eq(1)
+        expect(response.body).to include("Delete your review")
+      end
+    end
   end
 end
