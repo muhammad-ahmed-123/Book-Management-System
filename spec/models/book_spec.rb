@@ -29,6 +29,48 @@ RSpec.describe Book, type: :model do
 
       expect(book).not_to be_valid
     end
+
+    it "is invalid with a title shorter than 3 characters" do
+      book.title = "Ab"
+
+      expect(book).not_to be_valid
+    end
+
+    it "is invalid with a title longer than 30 characters" do
+      book.title = "a" * 31
+
+      expect(book).not_to be_valid
+    end
+
+    it "is valid with a title exactly 30 characters long" do
+      book.title = "a" * 30
+
+      expect(book).to be_valid
+    end
+
+    it "is invalid with an author shorter than 3 characters" do
+      book.author = "Ab"
+
+      expect(book).not_to be_valid
+    end
+
+    it "is invalid with an author longer than 30 characters" do
+      book.author = "a" * 31
+
+      expect(book).not_to be_valid
+    end
+
+    it "is invalid with a description longer than 500 characters" do
+      book.description = "a" * 501
+
+      expect(book).not_to be_valid
+    end
+
+    it "is valid with a description exactly 500 characters long" do
+      book.description = "a" * 500
+
+      expect(book).to be_valid
+    end
   end
 
   describe "associations" do
