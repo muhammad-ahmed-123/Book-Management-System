@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe Book, type: :model do
   let(:user) { User.create!(email_address: "owner@gmail.com", password: "Secret_123") }
   let(:genre) { Genre.create!(name: "Fiction") }
-  let(:valid_attributes) { { title: "A Title", author: "An Author", user: user, genres: [genre] } }
+  let(:valid_attributes) { { title: "A Title", author: "An Author", user: user, genres: [ genre ] } }
 
   describe "validations" do
     it "requires a title" do
