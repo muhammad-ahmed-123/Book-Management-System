@@ -5,9 +5,14 @@ RSpec.describe Favourite, type: :model do
   let(:other_user) { User.create!(email_address: "other@gmail.com", password: "Secret_123") }
   let(:genre) { Genre.create!(name: "Fiction") }
   let(:book) { Book.create!(title: "A Title", author: "An Author", user: owner, genres: [genre]) }
+
   describe "validations" do
-    subject { Favourite.create!(book: book, user: other_user) }
-    it { should validate_uniqueness_of(:user_id).scoped_to(:book_id) }
+    it "requires a unique favourite per user per book" do
+      Favourite.create!(book: book, user: other_user)
+      duplicate = Favourite.new(book: book, user: other_user)
+      expect(duplicate).not_to be_valid
+      expect(duplicate.errors[:user_id]).to include("have already favourited this book")
+    end
   end
 
   describe "business rules" do

@@ -1,11 +1,12 @@
 require "rails_helper"
 
 RSpec.describe "Comments", type: :request do
-  let(:owner) { create(:user) }
-  let(:other_user) { create(:user) }
-  let(:book) { create(:book, user: owner) }
-  let(:review) { create(:review, book: book) }
-  let(:comment) { create(:comment, review: review, user: other_user) }
+  let(:owner) { User.create!(email_address: "owner@gmail.com", password: "Secret_123") }
+  let(:other_user) { User.create!(email_address: "other@gmail.com", password: "Secret_123") }
+  let(:genre) { Genre.create!(name: "Fiction") }
+  let(:book) { Book.create!(title: "A Title", author: "An Author", user: owner, genres: [ genre ]) }
+  let(:review) { Review.create!(book: book, user: other_user, rating: 4, body: "Great") }
+  let(:comment) { Comment.create!(review: review, user: other_user, body: "Nice review") }
 
   describe "POST /books/:book_id/reviews/:review_id/comments" do
     context "when unauthenticated" do
@@ -28,7 +29,7 @@ RSpec.describe "Comments", type: :request do
       end
 
       it "ignores spoofed review_id or user_id in params" do
-        other_review = create(:review)
+        other_review = Review.create!(book: book, user: owner, rating: 5, body: "Another review")
         params = { comment: { body: "ok", review_id: other_review.id, user_id: owner.id } }
 
         post book_review_comments_path(book, review), params: params
@@ -39,7 +40,7 @@ RSpec.describe "Comments", type: :request do
 
       it "fails gracefully with validation errors" do
         post book_review_comments_path(book, review), params: { comment: { body: "x" } }
-        
+
         expect(response).to redirect_to(book_path(book))
         expect(flash[:alert]).to include("too short")
       end
@@ -77,7 +78,7 @@ RSpec.describe "Comments", type: :request do
       expect {
         delete book_review_comment_path(book, review, target_comment)
       }.not_to change(Comment, :count)
-      
+
       expect(flash[:alert]).to be_present
     end
 

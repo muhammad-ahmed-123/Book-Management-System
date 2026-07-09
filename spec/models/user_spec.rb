@@ -2,39 +2,92 @@ require "rails_helper"
 
 RSpec.describe User, type: :model do
   let(:valid_attributes) { { email_address: "person@gmail.com", password: "Secret_123" } }
-  let(:user) { User.new(valid_attributes) }
 
   describe "validations" do
-    subject { User.create!(valid_attributes) }
+    it "requires an email address" do
+      user = User.new(valid_attributes.merge(email_address: nil))
+      expect(user).not_to be_valid
+      expect(user.errors[:email_address]).to include("can't be blank")
+    end
 
-    it { should validate_presence_of(:email_address) }
-    it { should validate_uniqueness_of(:email_address).case_insensitive }
-    it { should have_secure_password }
-    it { should validate_length_of(:password).is_at_least(8) }
+    it "requires a unique email address" do
+      User.create!(valid_attributes)
+      duplicate = User.new(valid_attributes)
+      expect(duplicate).not_to be_valid
+      expect(duplicate.errors[:email_address]).to include("has already been taken")
+    end
+
+    it "stores a password digest when password is present" do
+      user = User.create!(valid_attributes)
+      expect(user.password_digest).to be_present
+    end
+
+    it "requires a password with at least 8 characters" do
+      user = User.new(valid_attributes.merge(password: "Short1_"))
+      expect(user).not_to be_valid
+      expect(user.errors[:password]).to include("is too short (minimum is 8 characters)")
+    end
 
     describe "email formatting" do
       it "normalizes the email address before validation" do
+        user = User.new(valid_attributes)
         user.email_address = "  Person@Gmail.com  "
         user.valid?
         expect(user.email_address).to eq("person@gmail.com")
       end
 
-      it { should allow_value("valid.person@gmail.com").for(:email_address) }
-      it { should_not allow_value("person@example.com").for(:email_address).with_message(/must be a gmail address/i) }
-      it { should_not allow_value("12345@gmail.com").for(:email_address) }
-      
-      it "is invalid when the local part exceeds 64 characters" do
+      it "accepts a valid gmail address" do
+        user = User.new(valid_attributes.merge(email_address: "valid.person@gmail.com"))
+        expect(user).to be_valid
+      end
+
+      it "rejects a non-gmail address" do
+        user = User.new(valid_attributes.merge(email_address: "person@example.com"))
+        expect(user).not_to be_valid
+        expect(user.errors[:email_address]).to include("must be a @gmail.com address, 1-64 characters before the @, and not numbers only")
+      end
+
+      it "rejects an address whose local part is all numbers" do
+        user = User.new(valid_attributes.merge(email_address: "12345@gmail.com"))
+        expect(user).not_to be_valid
+      end
+
+      it "rejects an address when the local part exceeds 64 characters" do
         long_email = "#{'a' * 65}@gmail.com"
-        should_not allow_value(long_email).for(:email_address)
+        user = User.new(valid_attributes.merge(email_address: long_email))
+        expect(user).not_to be_valid
       end
     end
 
     describe "custom password complexity" do
-      it { should_not allow_value("secret_123").for(:password).with_message(/must include an uppercase letter/) }
-      it { should_not allow_value("SECRET_123").for(:password).with_message(/must include a lowercase letter/) }
-      it { should_not allow_value("Secret_abc").for(:password).with_message(/must include a number/) }
-      it { should_not allow_value("Secret1234").for(:password).with_message(/must include an underscore/) }
-      it { should allow_value("Valid_Pass123").for(:password) }
+      it "rejects a password without an uppercase letter" do
+        user = User.new(valid_attributes.merge(password: "secret_123"))
+        expect(user).not_to be_valid
+        expect(user.errors[:password]).to include("must include an uppercase letter, a lowercase letter, a number, and an underscore")
+      end
+
+      it "rejects a password without a lowercase letter" do
+        user = User.new(valid_attributes.merge(password: "SECRET_123"))
+        expect(user).not_to be_valid
+        expect(user.errors[:password]).to include("must include an uppercase letter, a lowercase letter, a number, and an underscore")
+      end
+
+      it "rejects a password without a number" do
+        user = User.new(valid_attributes.merge(password: "Secret_abc"))
+        expect(user).not_to be_valid
+        expect(user.errors[:password]).to include("must include an uppercase letter, a lowercase letter, a number, and an underscore")
+      end
+
+      it "rejects a password without an underscore" do
+        user = User.new(valid_attributes.merge(password: "Secret1234"))
+        expect(user).not_to be_valid
+        expect(user.errors[:password]).to include("must include an uppercase letter, a lowercase letter, a number, and an underscore")
+      end
+
+      it "accepts a valid password" do
+        user = User.new(valid_attributes.merge(password: "Valid_Pass123"))
+        expect(user).to be_valid
+      end
     end
   end
 end

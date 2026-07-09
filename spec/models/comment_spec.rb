@@ -6,9 +6,23 @@ RSpec.describe Comment, type: :model do
   let(:genre) { Genre.create!(name: "Fiction") }
   let(:book) { Book.create!(title: "A Title", author: "An Author", user: owner, genres: [genre]) }
   let(:review) { Review.create!(book: book, user: reviewer, rating: 4, body: "Good read") }
+
   describe "validations" do
-    it { should validate_presence_of(:body) }
-    it { should validate_length_of(:body).is_at_least(2).is_at_most(500) }
+    it "requires a body" do
+      comment = Comment.new(review: review, user: reviewer, body: nil)
+      expect(comment).not_to be_valid
+      expect(comment.errors[:body]).to include("can't be blank")
+    end
+
+    it "limits body length" do
+      short = Comment.new(review: review, user: reviewer, body: "a")
+      expect(short).not_to be_valid
+      expect(short.errors[:body]).to include("is too short (minimum is 2 characters)")
+
+      long = Comment.new(review: review, user: reviewer, body: "a" * 501)
+      expect(long).not_to be_valid
+      expect(long.errors[:body]).to include("is too long (maximum is 500 characters)")
+    end
   end
 
   describe "business rules: multiple comments" do

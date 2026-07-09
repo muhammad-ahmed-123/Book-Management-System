@@ -1,11 +1,13 @@
 require "rails_helper"
 
 RSpec.describe "Books", type: :request do
-  let(:owner) { create(:user) }
-  let(:other_user) { create(:user) }
-  let(:fiction) { create(:genre, name: "Fiction") }
-  let(:mystery) { create(:genre, name: "Mystery") }
-  let(:book) { create(:book, user: owner, genres: [fiction]) }
+  let(:owner) { User.create!(email_address: "owner@gmail.com", password: "Secret_123") }
+  let(:other_user) { User.create!(email_address: "other@gmail.com", password: "Secret_123") }
+  let(:fiction) { Genre.create!(name: "Fiction") }
+  let(:mystery) { Genre.create!(name: "Mystery") }
+  let(:book) do
+    Book.create!(title: "A Title", author: "An Author", user: owner, genres: [ fiction ])
+  end
 
   describe "GET /books" do
     let!(:existing_book) { book }
@@ -33,7 +35,7 @@ RSpec.describe "Books", type: :request do
       end
 
       it "shows a Remove from Favourites button when favourited" do
-        create(:favourite, book: existing_book, user: other_user)
+        Favourite.create!(book: existing_book, user: other_user)
         get books_path
         expect(response.body).to include("Remove from Favourites")
       end
@@ -49,7 +51,7 @@ RSpec.describe "Books", type: :request do
     end
 
     it "never shows a favourite toggle button on the detail page" do
-      create(:favourite, book: book, user: other_user)
+      Favourite.create!(book: book, user: other_user)
       sign_in(other_user)
 
       get book_path(book)
@@ -78,7 +80,14 @@ RSpec.describe "Books", type: :request do
       before { sign_in(owner) }
 
       it "creates a book and assigns genres" do
-        params = { book: attributes_for(:book).merge(genre_ids: [fiction.id, mystery.id]) }
+        params = {
+          book: {
+            title: "New Book",
+            author: "New Author",
+            description: "A new book",
+            genre_ids: [ fiction.id, mystery.id ]
+          }
+        }
 
         expect { post books_path, params: params }.to change(Book, :count).by(1)
 
@@ -88,7 +97,15 @@ RSpec.describe "Books", type: :request do
       end
 
       it "ignores spoofed user_ids via strong params" do
-        params = { book: attributes_for(:book, user_id: other_user.id, genre_ids: [fiction.id]) }
+        params = {
+          book: {
+            title: "New Book",
+            author: "New Author",
+            description: "A new book",
+            user_id: other_user.id,
+            genre_ids: [ fiction.id ]
+          }
+        }
         post books_path, params: params
         expect(Book.last.user).to eq(owner)
       end
@@ -99,7 +116,14 @@ RSpec.describe "Books", type: :request do
       end
 
       it "deduplicates submitted genres" do
-        params = { book: attributes_for(:book, genre_ids: [fiction.id, fiction.id]) }
+        params = {
+          book: {
+            title: "New Book",
+            author: "New Author",
+            description: "A new book",
+            genre_ids: [ fiction.id, fiction.id ]
+          }
+        }
         post books_path, params: params
         expect(Book.last.genres).to contain_exactly(fiction)
       end
@@ -119,12 +143,12 @@ RSpec.describe "Books", type: :request do
       end
 
       it "swaps genres when new genre_ids are submitted" do
-        patch book_path(book), params: { book: { genre_ids: [mystery.id] } }
+        patch book_path(book), params: { book: { genre_ids: [ mystery.id ] } }
         expect(book.reload.genres).to contain_exactly(mystery)
       end
 
       it "rejects the update if every genre is unchecked" do
-        patch book_path(book), params: { book: { title: "Hacked", genre_ids: [""] } }
+        patch book_path(book), params: { book: { title: "Hacked", genre_ids: [ "" ] } }
 
         expect(response).to have_http_status(:unprocessable_content)
         expect(book.reload.title).not_to eq("Hacked")
@@ -134,7 +158,7 @@ RSpec.describe "Books", type: :request do
     context "when the current user is unauthorized" do
       it "redirects without updating" do
         sign_in(other_user)
-        
+
         patch book_path(book), params: { book: { title: "Hacked" } }
 
         expect(response).to redirect_to(books_path)
@@ -144,7 +168,7 @@ RSpec.describe "Books", type: :request do
   end
 
   describe "DELETE /books/:id" do
-    let!(:target_book) { create(:book, user: owner) }
+    let!(:target_book) { Book.create!(title: "Target Book", author: "Author", user: owner, genres: [ fiction ]) }
 
     it "destroys the book if authorized" do
       sign_in(owner)

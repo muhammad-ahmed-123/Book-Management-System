@@ -5,12 +5,31 @@ RSpec.describe Review, type: :model do
   let(:reviewer) { User.create!(email_address: "reviewer@gmail.com", password: "Secret_123") }
   let(:genre) { Genre.create!(name: "Fiction") }
   let(:book) { Book.create!(title: "A Title", author: "An Author", user: owner, genres: [genre]) }
-  describe "validations" do
-    subject { Review.create!(book: book, user: reviewer, rating: 4, body: "Good read") }
 
-    it { should validate_presence_of(:rating) }
-    it { should validate_presence_of(:body) }
-    it { should validate_numericality_of(:rating).only_integer.is_greater_than_or_equal_to(1).is_less_than_or_equal_to(5) } 
-    it { should validate_uniqueness_of(:user_id).scoped_to(:book_id).with_message("has already reviewed this book") }
+  describe "validations" do
+    it "requires a rating" do
+      review = Review.new(book: book, user: reviewer, rating: nil, body: "Good read")
+      expect(review).not_to be_valid
+      expect(review.errors[:rating]).to include("can't be blank")
+    end
+
+    it "requires a body" do
+      review = Review.new(book: book, user: reviewer, rating: 4, body: nil)
+      expect(review).not_to be_valid
+      expect(review.errors[:body]).to include("can't be blank")
+    end
+
+    it "requires rating to be between 1 and 5" do
+      invalid = Review.new(book: book, user: reviewer, rating: 0, body: "Good read")
+      expect(invalid).not_to be_valid
+      expect(invalid.errors[:rating]).to include("must be between 1 and 5")
+    end
+
+    it "prevents a user from reviewing the same book twice" do
+      Review.create!(book: book, user: reviewer, rating: 4, body: "Good read")
+      duplicate = Review.new(book: book, user: reviewer, rating: 5, body: "Another read")
+      expect(duplicate).not_to be_valid
+      expect(duplicate.errors[:user_id]).to include("have already reviewed this book")
+    end
   end
 end

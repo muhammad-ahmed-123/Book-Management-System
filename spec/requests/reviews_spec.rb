@@ -1,10 +1,11 @@
 require "rails_helper"
 
 RSpec.describe "Reviews", type: :request do
-  let(:owner) { create(:user) }
-  let(:reviewer) { create(:user) }
-  let(:book) { create(:book, user: owner) }
-  let(:review) { create(:review, book: book, user: reviewer) }
+  let(:owner) { User.create!(email_address: "owner@gmail.com", password: "Secret_123") }
+  let(:reviewer) { User.create!(email_address: "reviewer@gmail.com", password: "Secret_123") }
+  let(:genre) { Genre.create!(name: "Fiction") }
+  let(:book) { Book.create!(title: "A Title", author: "An Author", user: owner, genres: [ genre ]) }
+  let(:review) { Review.create!(book: book, user: reviewer, rating: 4, body: "Great") }
 
   describe "POST /books/:book_id/reviews" do
     context "when authenticated" do
@@ -19,8 +20,8 @@ RSpec.describe "Reviews", type: :request do
       it "prevents users from reviewing their own books" do
         sign_in(owner)
 
-        expect { 
-          post book_reviews_path(book), params: { review: { rating: 5, body: "Self praise" } } 
+        expect {
+          post book_reviews_path(book), params: { review: { rating: 5, body: "Self praise" } }
         }.not_to change(Review, :count)
 
         expect(flash[:alert]).to include("can't review your own book")
@@ -28,15 +29,15 @@ RSpec.describe "Reviews", type: :request do
 
       it "prevents duplicate reviews from the same user" do
         review # Create existing review
-        expect { 
-          post book_reviews_path(book), params: { review: { rating: 2, body: "Again" } } 
+        expect {
+          post book_reviews_path(book), params: { review: { rating: 2, body: "Again" } }
         }.not_to change(Review, :count)
 
         expect(flash[:alert]).to be_present
       end
 
       it "neutralizes array injections in scalar params" do
-        post book_reviews_path(book), params: { review: { rating: ["1", "2"], body: "x" } }
+        post book_reviews_path(book), params: { review: { rating: [ "1", "2" ], body: "x" } }
         expect(response).to have_http_status(:unprocessable_content)
       end
     end
@@ -53,7 +54,7 @@ RSpec.describe "Reviews", type: :request do
     end
 
     it "rejects updates if unauthorized" do
-      sign_in(create(:user))
+      sign_in(User.create!(email_address: "random@gmail.com", password: "Secret_123"))
       patch book_review_path(book, existing_review), params: { review: { rating: 1 } }
 
       expect(flash[:alert]).to eq("You are not authorized to edit that review.")

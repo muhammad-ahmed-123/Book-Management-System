@@ -1,8 +1,10 @@
 require "rails_helper"
 
 RSpec.describe "Favourites", type: :request do
-  let(:fan) { create(:user) }
-  let(:book) { create(:book) }
+  let(:fan) { User.create!(email_address: "fan@gmail.com", password: "Secret_123") }
+  let(:book) do
+    Book.create!(title: "A Title", author: "An Author", user: fan, genres: [ Genre.create!(name: "Fiction") ])
+  end
 
   describe "POST /books/:book_id/favourite" do
     context "when authenticated" do
@@ -16,7 +18,7 @@ RSpec.describe "Favourites", type: :request do
       end
 
       it "prevents duplicate favourites" do
-        create(:favourite, book: book, user: fan)
+        Favourite.create!(book: book, user: fan)
 
         expect { post book_favourite_path(book) }.not_to change(Favourite, :count)
         expect(flash[:alert]).to be_present
@@ -38,7 +40,7 @@ RSpec.describe "Favourites", type: :request do
   end
 
   describe "DELETE /books/:book_id/favourite" do
-    let!(:favourite) { create(:favourite, book: book, user: fan) }
+    let!(:favourite) { Favourite.create!(book: book, user: fan) }
 
     before { sign_in(fan) }
 
@@ -66,9 +68,9 @@ RSpec.describe "Favourites", type: :request do
       before { sign_in(fan) }
 
       it "lists only the current user's favourited books" do
-        other_book = create(:book)
-        create(:favourite, book: book, user: fan)
-        create(:favourite, book: other_book) # belongs to a different user
+        other_book = Book.create!(title: "Other Book", author: "Another", user: fan, genres: [ Genre.create!(name: "Mystery") ])
+        Favourite.create!(book: book, user: fan)
+        Favourite.create!(book: other_book, user: User.create!(email_address: "otherfan@gmail.com", password: "Secret_123"))
 
         get favourites_path
 
@@ -77,10 +79,10 @@ RSpec.describe "Favourites", type: :request do
       end
 
       it "displays the most recently favourited book first" do
-        second_book = create(:book)
-        create(:favourite, book: book, user: fan)
+        second_book = Book.create!(title: "Second Book", author: "Another", user: fan, genres: [ Genre.create!(name: "Sci-Fi") ])
+        Favourite.create!(book: book, user: fan)
         travel_to(1.hour.from_now) do
-          create(:favourite, book: second_book, user: fan)
+          Favourite.create!(book: second_book, user: fan)
         end
 
         get favourites_path
