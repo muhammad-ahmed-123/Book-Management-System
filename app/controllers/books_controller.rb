@@ -9,7 +9,7 @@ class BooksController < ApplicationController
   end
 
   def show
-    @reviews = @book.reviews.includes(:user).order(created_at: :desc)
+    @reviews = @book.reviews.includes(:user, comments: :user).order(created_at: :desc)
     @current_user_review = @book.reviews.find_by(user: Current.user) if authenticated?
   end
 

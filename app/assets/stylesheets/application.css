@@ -538,6 +538,28 @@ p em { color: var(--color-text-faint); }
 .review-card .review-actions .btn-danger { color: #b58a80; }
 .review-card .review-actions .btn-danger:hover { color: var(--color-primary); background: none; }
 
+.comment-list {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0 0 0 1.1rem;
+  border-left: 2px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.comment-card p { margin: 0.2rem 0 0; font-size: 0.95rem; }
+.comment-meta { font-family: var(--font-ui); font-size: 0.8rem; color: var(--color-text-muted); margin: 0; }
+.comment-card .btn {
+  min-height: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 0.8rem;
+  color: #b58a80;
+  margin-top: 0.3rem;
+}
+.comment-card .btn:hover { color: var(--color-primary); background: none; }
+
 /* ---------------------------------------------------------------- Auth pages
  * Optional: wrap sessions/registrations/passwords content in <div class="auth-card">
  * for the centered narrow column shown in the prototype. Works without it too.

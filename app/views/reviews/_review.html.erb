@@ -9,4 +9,20 @@
       <%= button_to "Delete your review", book_review_path(review.book, review), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger" %>
     </div>
   <% end %>
+
+  <% if review.comments.any? %>
+    <ul class="comment-list">
+      <%= render partial: "comments/comment", collection: review.comments, locals: { review: review } %>
+    </ul>
+  <% end %>
+
+  <% if authenticated? %>
+    <%= form_with model: [ review.book, review, Comment.new ] do |form| %>
+      <div class="field">
+        <%= form.label :body, "Add a comment" %>
+        <%= form.text_area :body, required: true %>
+      </div>
+      <%= form.submit "Post Comment" %>
+    <% end %>
+  <% end %>
 </li>

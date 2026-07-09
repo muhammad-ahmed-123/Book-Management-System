@@ -3,7 +3,9 @@ Rails.application.routes.draw do
   resource :registration, only: %i[ new create ]
   resources :passwords, param: :token
   resources :books do
-    resources :reviews, only: %i[ new create edit update destroy ]
+    resources :reviews, only: %i[ new create edit update destroy ] do
+      resources :comments, only: %i[ create destroy ]
+    end
     resource :favourite, only: %i[ create destroy ]
   end
   resources :favourites, only: %i[ index ]

@@ -1,0 +1,7 @@
+<li class="comment-card">
+  <p class="comment-meta"><%= comment.user.email_address %></p>
+  <p><%= simple_format(comment.body) %></p>
+  <% if Current.user == comment.user %>
+    <%= button_to "Delete", book_review_comment_path(review.book, review, comment), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger" %>
+  <% end %>
+</li>

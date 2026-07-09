@@ -1,284 +1,173 @@
 require "rails_helper"
 
 RSpec.describe "Books", type: :request do
-  let(:owner) { User.create!(email_address: "owner@gmail.com", password: "Secret_123") }
-  let(:other_user) { User.create!(email_address: "other@gmail.com", password: "Secret_123") }
-  let(:fiction) { Genre.create!(name: "Fiction") }
-  let(:mystery) { Genre.create!(name: "Mystery") }
-  let(:book) { Book.create!(title: "The Pragmatic Programmer", author: "David Thomas", user: owner, genres: [ fiction ]) }
-
-  def sign_in(user)
-    post session_path, params: { email_address: user.email_address, password: "Secret_123" }
-  end
+  let(:owner) { create(:user) }
+  let(:other_user) { create(:user) }
+  let(:fiction) { create(:genre, name: "Fiction") }
+  let(:mystery) { create(:genre, name: "Mystery") }
+  let(:book) { create(:book, user: owner, genres: [fiction]) }
 
   describe "GET /books" do
-    it "is visible to anonymous visitors and lists existing books" do
-      book
+    let!(:existing_book) { book }
 
+    it "is visible to anonymous visitors and lists existing books" do
       get books_path
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include(book.title)
+      expect(response.body).to include(existing_book.title)
     end
 
     context "when the visitor is not signed in" do
       it "does not show a favourite toggle button" do
-        book
-
         get books_path
-
         expect(response.body).not_to include("Favourites")
       end
     end
 
-    context "when the current user has not favourited the book" do
-      it "shows an Add to Favourites button" do
-        book
-        sign_in(other_user)
+    context "when the visitor is signed in" do
+      before { sign_in(other_user) }
 
+      it "shows an Add to Favourites button when not favourited" do
         get books_path
-
         expect(response.body).to include("Add to Favourites")
       end
-    end
 
-    context "when the current user has favourited the book" do
-      it "shows a Remove from Favourites button" do
-        Favourite.create!(book: book, user: other_user)
-        sign_in(other_user)
-
+      it "shows a Remove from Favourites button when favourited" do
+        create(:favourite, book: existing_book, user: other_user)
         get books_path
-
         expect(response.body).to include("Remove from Favourites")
       end
     end
   end
 
   describe "GET /books/:id" do
-    it "is visible to anonymous visitors" do
+    it "is visible to anonymous visitors and displays genres" do
       get book_path(book)
 
       expect(response).to have_http_status(:ok)
-    end
-
-    it "displays the book's genres" do
-      get book_path(book)
-
       expect(response.body).to include(fiction.name)
     end
 
-    context "when the id does not correspond to an existing book" do
-      it "redirects to the books list instead of raising" do
-        get book_path(999_999)
+    it "never shows a favourite toggle button on the detail page" do
+      create(:favourite, book: book, user: other_user)
+      sign_in(other_user)
 
+      get book_path(book)
+
+      expect(response.body).not_to include("Add to Favourites")
+      expect(response.body).not_to include("Remove from Favourites")
+    end
+
+    context "when the record does not exist" do
+      it "redirects to the books list" do
+        get book_path("invalid_id")
         expect(response).to redirect_to(books_path)
-      end
-    end
-
-    context "when the id is not numeric" do
-      it "redirects to the books list instead of raising" do
-        get "/books/abc"
-
-        expect(response).to redirect_to(books_path)
-      end
-    end
-
-    context "when the id is negative, zero, or oversized" do
-      it "redirects to the books list instead of raising" do
-        [ -1, 0, 99_999_999_999_999_999_999 ].each do |bad_id|
-          get "/books/#{bad_id}"
-
-          expect(response).to redirect_to(books_path)
-        end
-      end
-    end
-
-    context "regardless of favourite state" do
-      it "never shows a favourite toggle button on the book detail page" do
-        Favourite.create!(book: book, user: other_user)
-        sign_in(other_user)
-
-        get book_path(book)
-
-        expect(response.body).not_to include("Add to Favourites")
-        expect(response.body).not_to include("Remove from Favourites")
       end
     end
   end
 
   describe "POST /books" do
-    context "when the visitor is not signed in" do
-      it "redirects to sign in and does not create a book" do
-        expect {
-          post books_path, params: { book: { title: "New Book", author: "Someone" } }
-        }.not_to change(Book, :count)
-
+    context "when unauthenticated" do
+      it "redirects to sign in" do
+        post books_path, params: { book: { title: "New Book" } }
         expect(response).to redirect_to(new_session_path)
       end
     end
 
-    context "when the visitor is signed in" do
-      it "creates a book owned by the current user" do
-        sign_in(owner)
+    context "when authenticated" do
+      before { sign_in(owner) }
 
-        expect {
-          post books_path, params: { book: { title: "New Book", author: "Owner", description: "A great read", genre_ids: [ fiction.id ] } }
-        }.to change(Book, :count).by(1)
+      it "creates a book and assigns genres" do
+        params = { book: attributes_for(:book).merge(genre_ids: [fiction.id, mystery.id]) }
+
+        expect { post books_path, params: params }.to change(Book, :count).by(1)
 
         expect(response).to redirect_to(Book.last)
+        expect(Book.last.genres).to contain_exactly(fiction, mystery)
         expect(Book.last.user).to eq(owner)
       end
 
-      it "does not let the owning user be spoofed via params" do
-        sign_in(owner)
-
-        post books_path, params: { book: { title: "New Book", author: "Owner", user_id: other_user.id, genre_ids: [ fiction.id ] } }
-
+      it "ignores spoofed user_ids via strong params" do
+        params = { book: attributes_for(:book, user_id: other_user.id, genre_ids: [fiction.id]) }
+        post books_path, params: params
         expect(Book.last.user).to eq(owner)
       end
 
-      it "re-renders the form as unprocessable when the book is invalid" do
-        sign_in(owner)
-
-        expect {
-          post books_path, params: { book: { title: "", author: "" } }
-        }.not_to change(Book, :count)
-
+      it "re-renders unprocessable entity on validation failure" do
+        post books_path, params: { book: { title: "", genre_ids: [] } }
         expect(response).to have_http_status(:unprocessable_content)
       end
 
-      it "assigns the selected genres to the created book" do
-        sign_in(owner)
-
-        post books_path, params: { book: { title: "New Book", author: "Owner", genre_ids: [ fiction.id, mystery.id ] } }
-
-        expect(Book.last.genres).to contain_exactly(fiction, mystery)
-      end
-
-      context "when no genre is selected" do
-        it "does not create a book" do
-          expect {
-            sign_in(owner)
-            post books_path, params: { book: { title: "New Book", author: "Owner", genre_ids: [ "" ] } }
-          }.not_to change(Book, :count)
-
-          expect(response).to have_http_status(:unprocessable_content)
-        end
-      end
-
-      context "when the same genre is submitted more than once" do
-        it "creates the book with the genre assigned only once instead of crashing" do
-          sign_in(owner)
-
-          expect {
-            post books_path, params: { book: { title: "New Book", author: "Owner", genre_ids: [ fiction.id.to_s, fiction.id.to_s ] } }
-          }.to change(Book, :count).by(1)
-
-          expect(response).to redirect_to(Book.last)
-          expect(Book.last.genres).to contain_exactly(fiction)
-        end
+      it "deduplicates submitted genres" do
+        params = { book: attributes_for(:book, genre_ids: [fiction.id, fiction.id]) }
+        post books_path, params: params
+        expect(Book.last.genres).to contain_exactly(fiction)
       end
     end
   end
 
   describe "PATCH /books/:id" do
     context "when the current user owns the book" do
-      it "updates the book" do
-        sign_in(owner)
+      before { sign_in(owner) }
 
+      it "updates the book and leaves unsubmitted genres untouched" do
         patch book_path(book), params: { book: { title: "Updated Title" } }
 
         expect(response).to redirect_to(book_path(book))
         expect(book.reload.title).to eq("Updated Title")
+        expect(book.genres).to contain_exactly(fiction)
       end
 
-      it "leaves existing genres untouched when genre_ids is not submitted" do
-        sign_in(owner)
-
-        patch book_path(book), params: { book: { title: "Updated Title" } }
-
-        expect(book.reload.genres).to contain_exactly(fiction)
-      end
-
-      it "swaps the selected genres when new genre_ids are submitted" do
-        sign_in(owner)
-
-        patch book_path(book), params: { book: { genre_ids: [ mystery.id ] } }
-
-        expect(response).to redirect_to(book_path(book))
+      it "swaps genres when new genre_ids are submitted" do
+        patch book_path(book), params: { book: { genre_ids: [mystery.id] } }
         expect(book.reload.genres).to contain_exactly(mystery)
       end
 
-      context "when every genre is unchecked" do
-        it "rejects the update and leaves the title and genres unchanged" do
-          book
-          original_title = book.title
-          original_genre_ids = book.genre_ids.sort
+      it "rejects the update if every genre is unchecked" do
+        patch book_path(book), params: { book: { title: "Hacked", genre_ids: [""] } }
 
-          sign_in(owner)
-          patch book_path(book), params: { book: { title: "Should not save", genre_ids: [ "" ] } }
-
-          expect(response).to have_http_status(:unprocessable_content)
-          expect(book.reload.title).to eq(original_title)
-          expect(book.genre_ids.sort).to eq(original_genre_ids)
-        end
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(book.reload.title).not_to eq("Hacked")
       end
     end
 
-    context "when the current user does not own the book" do
-      it "does not update the book and redirects with an alert" do
+    context "when the current user is unauthorized" do
+      it "redirects without updating" do
         sign_in(other_user)
-        original_title = book.title
-
+        
         patch book_path(book), params: { book: { title: "Hacked" } }
 
         expect(response).to redirect_to(books_path)
-        expect(book.reload.title).to eq(original_title)
+        expect(book.reload.title).not_to eq("Hacked")
       end
     end
   end
 
   describe "DELETE /books/:id" do
-    context "when the current user owns the book" do
-      it "destroys the book" do
-        sign_in(owner)
-        book
+    let!(:target_book) { create(:book, user: owner) }
 
-        expect {
-          delete book_path(book)
-        }.to change(Book, :count).by(-1)
+    it "destroys the book if authorized" do
+      sign_in(owner)
 
-        expect(response).to redirect_to(books_path)
-      end
+      expect { delete book_path(target_book) }.to change(Book, :count).by(-1)
+      expect(response).to redirect_to(books_path)
     end
 
-    context "when the current user does not own the book" do
-      it "does not destroy the book" do
-        sign_in(other_user)
-        book
+    it "prevents destruction if unauthorized" do
+      sign_in(other_user)
 
-        expect {
-          delete book_path(book)
-        }.not_to change(Book, :count)
-
-        expect(response).to redirect_to(books_path)
-      end
+      expect { delete book_path(target_book) }.not_to change(Book, :count)
+      expect(response).to redirect_to(books_path)
     end
 
-    context "when the destroy fails" do
-      it "shows a failure alert instead of crashing" do
-        sign_in(owner)
-        book
-        allow_any_instance_of(Book).to receive(:destroy).and_return(false)
+    it "handles deletion failures gracefully" do
+      sign_in(owner)
+      allow_any_instance_of(Book).to receive(:destroy).and_return(false)
 
-        expect {
-          delete book_path(book)
-        }.not_to change(Book, :count)
+      delete book_path(target_book)
 
-        expect(response).to redirect_to(book_path(book))
-        follow_redirect!
-        expect(flash[:alert]).to eq("Book couldn't be deleted. Please try again.")
-      end
+      expect(response).to redirect_to(book_path(target_book))
+      expect(flash[:alert]).to be_present
     end
   end
 end

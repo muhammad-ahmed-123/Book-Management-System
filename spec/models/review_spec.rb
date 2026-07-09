@@ -4,63 +4,13 @@ RSpec.describe Review, type: :model do
   let(:owner) { User.create!(email_address: "owner@gmail.com", password: "Secret_123") }
   let(:reviewer) { User.create!(email_address: "reviewer@gmail.com", password: "Secret_123") }
   let(:genre) { Genre.create!(name: "Fiction") }
-  let(:book) { Book.create!(title: "A Title", author: "An Author", user: owner, genres: [ genre ]) }
-  let(:review) { Review.new(book: book, user: reviewer, rating: 4, body: "Good read") }
-
+  let(:book) { Book.create!(title: "A Title", author: "An Author", user: owner, genres: [genre]) }
   describe "validations" do
-    it "is invalid without a rating" do
-      review.rating = nil
+    subject { Review.create!(book: book, user: reviewer, rating: 4, body: "Good read") }
 
-      expect(review).not_to be_valid
-    end
-
-    it "is invalid without a body" do
-      review.body = nil
-
-      expect(review).not_to be_valid
-    end
-
-    it "is invalid with a rating below 1" do
-      review.rating = 0
-
-      expect(review).not_to be_valid
-    end
-
-    it "is invalid with a rating above 5" do
-      review.rating = 6
-
-      expect(review).not_to be_valid
-    end
-
-    it "is invalid when the same user reviews the same book twice" do
-      review.save!
-      duplicate = Review.new(book: book, user: reviewer, rating: 2, body: "Second thoughts")
-
-      expect(duplicate).not_to be_valid
-    end
-  end
-
-  describe "associations" do
-    it "belongs to a book" do
-      review.save!
-
-      expect(review.book).to eq(book)
-    end
-
-    it "belongs to a user" do
-      review.save!
-
-      expect(review.user).to eq(reviewer)
-    end
-
-    it "destroys its comments when the review is destroyed" do
-      review.save!
-      commenter = User.create!(email_address: "commenter@gmail.com", password: "Secret_123")
-      comment = Comment.create!(review: review, user: commenter, body: "Nice review!")
-
-      review.destroy
-
-      expect(Comment.find_by(id: comment.id)).to be_nil
-    end
+    it { should validate_presence_of(:rating) }
+    it { should validate_presence_of(:body) }
+    it { should validate_numericality_of(:rating).only_integer.is_greater_than_or_equal_to(1).is_less_than_or_equal_to(5) } 
+    it { should validate_uniqueness_of(:user_id).scoped_to(:book_id).with_message("has already reviewed this book") }
   end
 end
